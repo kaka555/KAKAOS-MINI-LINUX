@@ -4,10 +4,10 @@ ASM_SRCS =
 
 SUB_DIR = 
 
-ifeq (stm32f103,$(PROJECT))
-SRCS += fat.c
-SUB_DIR += FATFS
-endif
+#ifeq (stm32f103,$(PROJECT))
+#SRCS += fat.c
+#SUB_DIR += FATFS
+#endif
 
 $(SUB_TGT): $(SRCS:.c=.o) $(ASM_SRCS:.S=.o) $(SUB_DIR)
 	$(LD) $(SRCS:.c=.o) $(ASM_SRCS:.S=.o) $(SUB_DIR:=/$(SUB_TGT)) $(LDFLAG)  -r -o $@
