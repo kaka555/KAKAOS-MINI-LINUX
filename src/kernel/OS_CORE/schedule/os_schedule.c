@@ -109,7 +109,7 @@ int _sys_suspend(TASK_STATE state)
 	_insert_into_suspend_list((TCB *)OSTCBCurPtr);
 	schedule();
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**
@@ -167,7 +167,7 @@ static _must_check int _task_creat_ready(
 	}
 	schedule();
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**
@@ -240,7 +240,7 @@ int _must_check _task_init_ready(
 	}
 	schedule();
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**
@@ -359,7 +359,7 @@ int _exec(
 	_schedule();
 	/* exit critical area */
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**

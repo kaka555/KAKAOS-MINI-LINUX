@@ -7,98 +7,98 @@
 
 int default_open(struct file *file_ptr)
 {
-	ASSERT(NULL != file_ptr,ASSERT_INPUT);
+	ASSERT(NULL != file_ptr, ASSERT_INPUT);
 	(void)file_ptr;
-	KA_WARN(DEBUG_TYPE_VFS,"open file %s\n",file_ptr->f_den->name);
-	if(file_ptr->f_den->d_inode->inode_ops->inode_open(file_ptr) < 0)
+	KA_WARN(DEBUG_TYPE_VFS, "open file %s\n", file_ptr->f_den->name);
+	if (file_ptr->f_den->d_inode->inode_ops->inode_open(file_ptr) < 0)
 	{
-		KA_WARN(DEBUG_TYPE_VFS,"inode open file fail\n");
+		KA_WARN(DEBUG_TYPE_VFS, "inode open file fail\n");
 		return -ERROR_DISK;
 	}
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int default_close(struct file *file_ptr)
 {
-	ASSERT(NULL != file_ptr,ASSERT_INPUT);
+	ASSERT(NULL != file_ptr, ASSERT_INPUT);
 	(void)file_ptr;
-	KA_WARN(DEBUG_TYPE_VFS,"close file %s\n",file_ptr->f_den->name);
-	if(file_ptr->f_den->d_inode->inode_ops->inode_close(file_ptr) < 0)
+	KA_WARN(DEBUG_TYPE_VFS, "close file %s\n", file_ptr->f_den->name);
+	if (file_ptr->f_den->d_inode->inode_ops->inode_close(file_ptr) < 0)
 	{
-		KA_WARN(DEBUG_TYPE_VFS,"inode close file fail\n");
+		KA_WARN(DEBUG_TYPE_VFS, "inode close file fail\n");
 		return -ERROR_DISK;
 	}
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_read(struct file *file_ptr,void *buffer,unsigned int len,unsigned int offset)
+int default_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
 {
-	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0),ASSERT_INPUT);
-	ka_memset(buffer,0,len);
+	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0), ASSERT_INPUT);
+	ka_memset(buffer, 0, len);
 	struct inode *inode_ptr = file_ptr->f_den->d_inode;
-	int num = inode_ptr->inode_ops->read_data(file_ptr,buffer,len,offset);
-	if(num < 0)
+	int num = inode_ptr->inode_ops->read_data(file_ptr, buffer, len, offset);
+	if (num < 0)
 	{
-		KA_WARN(DEBUG_TYPE_VFS,"default_read fail\n");
+		KA_WARN(DEBUG_TYPE_VFS, "default_read fail\n");
 		return num;
 	}
 	file_ptr->offset += num;
 	return num;
 }
 
-int default_write(struct file *file_ptr,void *buffer,unsigned int len,unsigned int offset)
+int default_write(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
 {
-	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0),ASSERT_INPUT);
+	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0), ASSERT_INPUT);
 	struct inode *inode_ptr = file_ptr->f_den->d_inode;
-	int num = inode_ptr->inode_ops->write_data(file_ptr,buffer,len,offset);
-	if(num < 0)
+	int num = inode_ptr->inode_ops->write_data(file_ptr, buffer, len, offset);
+	if (num < 0)
 	{
-		KA_WARN(DEBUG_TYPE_VFS,"default_write fail\n");
+		KA_WARN(DEBUG_TYPE_VFS, "default_write fail\n");
 		return num;
 	}
-	if(!inode_is_soft(file_ptr->f_den->d_inode))
+	if (!inode_is_soft(file_ptr->f_den->d_inode))
 	{
 		file_ptr->offset += num;
 	}
 	return num;
 }
 
-int default_llseek(struct file *file_ptr,int offset,enum llseek_from from)
+int default_llseek(struct file *file_ptr, int offset, enum llseek_from from)
 {
-	ASSERT(NULL != file_ptr,ASSERT_INPUT);
+	ASSERT(NULL != file_ptr, ASSERT_INPUT);
 	switch (from)
 	{
-		case FILE_START:
-			if(offset < 0)
-			{
-				return -ERROR_USELESS_INPUT;
-			}
-			file_ptr->offset = (unsigned int)offset;
-			return FUN_EXECUTE_SUCCESSFULLY;
-		case FILE_CURRENT:
-			file_ptr->offset = file_ptr->offset + (unsigned int)offset;
-			return FUN_EXECUTE_SUCCESSFULLY;
-		case FILE_TAIL:
-			if(offset > 0)
-			{
-				return -ERROR_USELESS_INPUT;
-			}
-			file_ptr->offset = file_ptr->offset + (unsigned int)offset;
-			return FUN_EXECUTE_SUCCESSFULLY;
-		default :
-			KA_WARN(DEBUG_TYPE_VFS,"llseek flag error\n");
-			ASSERT(0,ASSERT_BAD_EXE_LOCATION);
+	case FILE_START:
+		if (offset < 0)
+		{
+			return -ERROR_USELESS_INPUT;
+		}
+		file_ptr->offset = (unsigned int)offset;
+		return 0;
+	case FILE_CURRENT:
+		file_ptr->offset = file_ptr->offset + (unsigned int)offset;
+		return 0;
+	case FILE_TAIL:
+		if (offset > 0)
+		{
+			return -ERROR_USELESS_INPUT;
+		}
+		file_ptr->offset = file_ptr->offset + (unsigned int)offset;
+		return 0;
+	default :
+		KA_WARN(DEBUG_TYPE_VFS, "llseek flag error\n");
+		ASSERT(0, ASSERT_BAD_EXE_LOCATION);
 	}
 	return -ERROR_LOGIC;
 }
 
-int default_ioctl(struct file *file_ptr,int cmd,int args)
+int default_ioctl(struct file *file_ptr, int cmd, int args)
 {
-	ASSERT(NULL != file_ptr,ASSERT_INPUT);
+	ASSERT(NULL != file_ptr, ASSERT_INPUT);
 	(void)file_ptr;
 	(void)cmd;
 	(void)args;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**  end of file_operations default function   **/
@@ -114,51 +114,51 @@ void default_cd(struct dentry *dentry_ptr)
 int default_inode_open(struct file *file_ptr)
 {
 	(void)file_ptr;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int default_inode_close(struct file *file_ptr)
 {
 	(void)file_ptr;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_change_name(struct inode *inode_ptr,struct dentry *dentry_ptr,const char *new_name)
+int default_change_name(struct inode *inode_ptr, struct dentry *dentry_ptr, const char *new_name)
 {
 	(void)inode_ptr;
 	(void)dentry_ptr;
 	(void)new_name;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_refresh(struct inode *inode_ptr,struct dentry *dentry_ptr)
+int default_refresh(struct inode *inode_ptr, struct dentry *dentry_ptr)
 {
 	(void)inode_ptr;
 	(void)dentry_ptr;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
-int default_floader_cmp_file_name(struct inode *inode_ptr,const char *name)
+int default_floader_cmp_file_name(struct inode *inode_ptr, const char *name)
 {
 	(void)inode_ptr;
 	(void)name;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_add_sub_file(struct dentry *dentry_ptr,const char *name)
+int default_add_sub_file(struct dentry *dentry_ptr, const char *name)
 {
 	(void)dentry_ptr;
 	(void)name;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_add_sub_folder(struct dentry *dentry_ptr,const char *folder_name)
+int default_add_sub_folder(struct dentry *dentry_ptr, const char *folder_name)
 {
 	(void)dentry_ptr;
 	(void)folder_name;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
-int default_read_data(struct file *file_ptr,void *store_ptr,unsigned int len,unsigned int offset)
+int default_read_data(struct file *file_ptr, void *store_ptr, unsigned int len, unsigned int offset)
 {
 	(void)file_ptr;
 	(void)store_ptr;
@@ -167,7 +167,7 @@ int default_read_data(struct file *file_ptr,void *store_ptr,unsigned int len,uns
 	return len;
 }
 
-int default_write_data(struct file *file_ptr,void *data_ptr,unsigned int len,unsigned int offset)
+int default_write_data(struct file *file_ptr, void *data_ptr, unsigned int len, unsigned int offset)
 {
 	(void)file_ptr;
 	(void)data_ptr;
@@ -179,13 +179,13 @@ int default_write_data(struct file *file_ptr,void *data_ptr,unsigned int len,uns
 int default_remove(struct dentry *dentry_ptr)
 {
 	(void)dentry_ptr;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int default_remove_dir(struct dentry *dentry_ptr)
 {
 	(void)dentry_ptr;
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int default_get_size(struct file *file_ptr)

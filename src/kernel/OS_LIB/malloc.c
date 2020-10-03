@@ -40,7 +40,7 @@ int add_page_alloc_record(unsigned int level, void *ptr)
 	recoed_ptr->level = level;
 	recoed_ptr->ptr = ptr;
 	singly_list_add(&recoed_ptr->list, &page_alloc_record_head);
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 #if CONFIG_MALLOC && CONFIG_ASSERT_DEBUG
@@ -76,7 +76,7 @@ static int find_and_remove_record(void *ptr)
 			_case_slab_free_buddy(ptr, (void *)((unsigned int)ptr + ka_pow(2, record_ptr->level - 1) * PAGE_SIZE_BYTE));
 			singly_list_del(&page_alloc_record_head, pos);
 			ka_free(record_ptr);
-			return FUN_EXECUTE_SUCCESSFULLY;
+			return 0;
 		}
 	}
 	return -1;
@@ -211,9 +211,9 @@ int in_os_memory(void *ptr)
 	ASSERT(NULL != buddy_ptr, ASSERT_PARA_AFFIRM);
 	while (NULL != buddy_ptr)
 	{
-		if (FUN_EXECUTE_SUCCESSFULLY == in_buddy_range(ptr))
+		if (0 == in_buddy_range(ptr))
 		{
-			return FUN_EXECUTE_SUCCESSFULLY;
+			return 0;
 		}
 		buddy_ptr = (struct buddy *)_get_next_buddy_ptr_head(buddy_ptr);
 	}
@@ -346,7 +346,7 @@ void *_ka_malloc(unsigned int size)
 			CPU_CRITICAL_EXIT();
 			return NULL;
 		}
-		if (FUN_EXECUTE_SUCCESSFULLY == add_page_alloc_record(level, ptr))
+		if (0 == add_page_alloc_record(level, ptr))
 		{
 			CPU_CRITICAL_EXIT();
 #if CONFIG_MALLOC && CONFIG_ASSERT_DEBUG
@@ -415,7 +415,7 @@ void _ka_free(void *ptr)
 	struct kmem_cache *kmem_cache_ptr;
 	struct slab *slab_ptr;
 	CPU_SR_ALLOC();
-	if (FUN_EXECUTE_SUCCESSFULLY != in_os_memory(ptr))
+	if (0 != in_os_memory(ptr))
 	{
 		KA_WARN(DEBUG_TYPE_MALLOC, "addr %p not in os legal scope\n", ptr);
 		return ;
@@ -449,7 +449,7 @@ void _ka_free(void *ptr)
 			}
 		}
 	}
-	if (FUN_EXECUTE_SUCCESSFULLY == find_and_remove_record(ptr))
+	if (0 == find_and_remove_record(ptr))
 	{
 		CPU_CRITICAL_EXIT();
 		return;
@@ -462,7 +462,7 @@ void _ka_free(void *ptr)
 
 void KA_FREE(void *ptr, const char* file_name, unsigned line, const char* function_name)
 {
-	if (FUN_EXECUTE_SUCCESSFULLY != in_os_memory(ptr))
+	if (0 != in_os_memory(ptr))
 	{
 		ka_printf(
 		    "free addr not in os legal scope. Error file: %s,line :%u, function name: %s\n",

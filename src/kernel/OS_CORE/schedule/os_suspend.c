@@ -15,25 +15,25 @@ static void __INIT __init_suspend_list(void)
 {
 	INIT_LIST_HEAD(&suspend_list_head);
 }
-INIT_FUN(__init_suspend_list,1);
+INIT_FUN(__init_suspend_list, 1);
 
 void _insert_into_suspend_list(TCB *const TCB_ptr)
 {
-	ASSERT(NULL != TCB_ptr,ASSERT_INPUT);
-	list_add_tail(&TCB_ptr->suspend_list,&suspend_list_head);
+	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
+	list_add_tail(&TCB_ptr->suspend_list, &suspend_list_head);
 }
 
 int _remove_from_suspend_list(TCB *TCB_ptr)
 {
-	ASSERT(NULL != TCB_ptr,ASSERT_INPUT);
+	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	struct list_head *pos;
-	list_for_each(pos,&suspend_list_head)
+	list_for_each(pos, &suspend_list_head)
 	{
-		if(&TCB_ptr->suspend_list == pos)
+		if (&TCB_ptr->suspend_list == pos)
 		{
 			list_del(pos);
 			_insert_ready_TCB(TCB_ptr);
-			return FUN_EXECUTE_SUCCESSFULLY;
+			return 0;
 		}
 	}
 	return -ERROR_USELESS_INPUT;

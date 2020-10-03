@@ -3,8 +3,6 @@
 
 #include <myMicroLIB.h>
 
-#define FUN_EXECUTE_SUCCESSFULLY 	0x00
-
 /*when the following #define, add a ‘-’ before it
   example:
   return -ERROR_NULL_INPUT_PTR;*/
@@ -19,9 +17,9 @@
 #define ERROR_DISK					0XF7
 #define ERROR_FAULT					0XF6 /* bad address */
 
-#define _must_check 
-#define PUBLIC  
-#define PRIVATE   
+#define _must_check
+#define PUBLIC
+#define PRIVATE
 
 #define KA_TRUE		1
 #define KA_FALSE	0

@@ -107,7 +107,7 @@ static void delay_task_check(void)
 void timer_task_check(void)
 {
 	struct timer *timer_ptr;
-	if (FUN_EXECUTE_SUCCESSFULLY == _get_timer_heap_top(&timer_ptr))
+	if (0 == _get_timer_heap_top(&timer_ptr))
 	{
 		if (TIME_FIRST_SMALLER_THAN_SECOND(_get_tick(), timer_ptr->wake_time))
 		{

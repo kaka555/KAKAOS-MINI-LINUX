@@ -35,7 +35,7 @@ static void __INIT __init_system_time(void)
 	sys_time.year    =  OS_YEAR;
 	sys_time.day     =  OS_DAY;
 }
-INIT_FUN(__init_system_time,1);
+INIT_FUN(__init_system_time, 1);
 
 /**
  * This is a system function
@@ -43,34 +43,34 @@ INIT_FUN(__init_system_time,1);
  * @DateTime    2018-10-12
  * @description : this function can only be used by os, be used in tick interrupt
  */
-void 
+void
 _system_time_increase(void)
 {
 	++sys_time.second;
-	if(60 == sys_time.second)
+	if (60 == sys_time.second)
 	{
 		sys_time.second = 0;
 		++sys_time.minute;
-		if(60 == sys_time.minute)
+		if (60 == sys_time.minute)
 		{
 			sys_time.minute = 0;
-		  	++sys_time.hour;
-			if(24 == sys_time.hour)
+			++sys_time.hour;
+			if (24 == sys_time.hour)
 			{
 				sys_time.hour = 0;
 				++sys_time.date;
 				++sys_time.day;
-				if(month_date_table[sys_time.month-1] < sys_time.date)
+				if (month_date_table[sys_time.month - 1] < sys_time.date)
 				{
 					sys_time.date = 1;
 					++sys_time.month;
-					if(sys_time.month == 13)
+					if (sys_time.month == 13)
 					{
 						sys_time.month = 1;
 						++sys_time.year;
 					}
 				}
-				if(8 == sys_time.day)
+				if (8 == sys_time.day)
 				{
 					sys_time.day = 1;
 				}
@@ -83,8 +83,8 @@ void _system_time_display(void)
 {
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	ka_printf("%d年%d月%d日--%d时%d分%d秒--星期%d\r\n",sys_time.year,
-	sys_time.month,sys_time.date,sys_time.hour,sys_time.minute,sys_time.second,sys_time.day);
+	ka_printf("%d年%d月%d日--%d时%d分%d秒--星期%d\r\n", sys_time.year,
+	          sys_time.month, sys_time.date, sys_time.hour, sys_time.minute, sys_time.second, sys_time.day);
 	CPU_CRITICAL_EXIT();
 }
 
@@ -96,7 +96,7 @@ EXPORT_SYMBOL(system_time_display);
 
 int _set_time(struct time *time_ptr)
 {
-	ASSERT(NULL != time_ptr,ASSERT_INPUT);
+	ASSERT(NULL != time_ptr, ASSERT_INPUT);
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
 	sys_time.date    =   time_ptr->date;
@@ -107,19 +107,19 @@ int _set_time(struct time *time_ptr)
 	sys_time.year    =   time_ptr->year;
 	sys_time.day     =   time_ptr->day;
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int set_time(struct time *time_ptr)
 {
-	if(NULL == time_ptr)
+	if (NULL == time_ptr)
 	{
-		OS_ERROR_PARA_MESSAGE_DISPLAY(set_time,time_ptr);
+		OS_ERROR_PARA_MESSAGE_DISPLAY(set_time, time_ptr);
 		return -ERROR_NULL_INPUT_PTR;
 	}
-	if((time_ptr->second >= 60) || (time_ptr->month >= 13)
-			|| (time_ptr->hour >= 24) || (time_ptr->day > 7)
-			|| (time_ptr->date > month_date_table[time_ptr->month]))
+	if ((time_ptr->second >= 60) || (time_ptr->month >= 13)
+	        || (time_ptr->hour >= 24) || (time_ptr->day > 7)
+	        || (time_ptr->date > month_date_table[time_ptr->month]))
 	{
 		return -ERROR_USELESS_INPUT;
 	}
@@ -127,4 +127,4 @@ int set_time(struct time *time_ptr)
 }
 EXPORT_SYMBOL(set_time);
 
-#endif	
+#endif

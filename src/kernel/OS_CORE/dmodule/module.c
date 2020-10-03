@@ -237,7 +237,7 @@ static int _remove_a_module(struct dynamic_module *dynamic_module_ptr)
 	list_del(&dynamic_module_ptr->module_list);
 	ka_free(dynamic_module_ptr);
 	CPU_CRITICAL_EXIT();
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 int remove_module(struct dynamic_module *dynamic_module_ptr)
@@ -639,7 +639,7 @@ int dlmodule_load_relocated_object(struct dynamic_module* module, void *module_p
 			}
 		}
 	}
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**
@@ -875,7 +875,7 @@ int dlmodule_load_shared_object(struct dynamic_module* module, void *module_ptr)
 		}
 	}
 
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 static void __init_d_module(struct dynamic_module *dynamic_module_ptr)
@@ -906,7 +906,7 @@ struct dynamic_module* dlmodule_load(void)
 {
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	int error = FUN_EXECUTE_SUCCESSFULLY;
+	int error = 0;
 	UINT8 *module_ptr = (UINT8 *)module_buffer;
 	struct dynamic_module *module = NULL;
 
@@ -946,7 +946,7 @@ struct dynamic_module* dlmodule_load(void)
 	}
 
 	/* check return value */
-	if (FUN_EXECUTE_SUCCESSFULLY != error) goto __exit;
+	if (0 != error) goto __exit;
 
 	/* increase module reference count */
 	module->ref ++;
@@ -1036,7 +1036,7 @@ int _dlmodule_exec(
 		return -ERROR_LOGIC;
 	}
 
-	return FUN_EXECUTE_SUCCESSFULLY;
+	return 0;
 }
 
 /**
