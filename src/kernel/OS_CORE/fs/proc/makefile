@@ -1,4 +1,4 @@
-SRCS = proc.c
+SRCS = proc.c meminfo.c
 
 ASM_SRCS = 
 

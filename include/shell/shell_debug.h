@@ -32,7 +32,7 @@ typedef char Shell_V_Type;
 #define SHELL_V_ARRAY_SIZE 8
 struct shell_variable
 {
-	char *shell_v_name;
+	const char *shell_v_name;
 	Shell_V_Type shell_v_type;
 	void *data_ptr;
 	struct singly_list_head list;

@@ -11,17 +11,27 @@ typedef int bool;
 
 static inline void *ERR_PTR(long error)
 {
-	return (void *) error;
+	return (void *)error;
 }
 
 static inline long PTR_ERR(const void *ptr)
 {
-	return (long) ptr;
+	return (long)ptr;
 }
 
 static inline bool IS_ERR(const void *ptr)
 {
 	return IS_ERR_VALUE((long)ptr);
+}
+
+static inline char i2c(int num)
+{
+	return (num + ('1' - 1));
+}
+
+static inline int c2i(char c)
+{
+	return (c + (1 - '1'));
 }
 
 #endif

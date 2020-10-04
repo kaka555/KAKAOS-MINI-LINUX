@@ -76,7 +76,7 @@ struct dentry
 {
 	struct dentry *d_parent; /* if NULL, means it is the dentry '/' */
 	struct inode *d_inode; /* if NULL, means that this dentry not exists in hardware */
-	char *name;
+	const char *name;
 	UINT32 flag; /* allocated? sysfs? normal? release? */
 	unsigned int ref;
 	struct list_head subdirs; /* this is the list head of it's subdirs */

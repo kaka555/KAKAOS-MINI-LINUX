@@ -15,6 +15,13 @@ static struct proc_dir_entry proc_root = {
 	.name = "proc",
 };
 
+static struct proc_dir_entry proc_thread_root = {
+	.mode = PROC_DIR,
+	.fops = &default_file_operations,
+	.parent = NULL,
+	.name = "thread_info"
+};
+
 static void proc_dir_entry_init(int mode,
                                 struct proc_dir_entry *proc_dir_entry_ptr,
                                 struct file_operations *fops,
@@ -91,4 +98,7 @@ void __INIT proc_init(void)
 		ASSERT(1, "should never go here\n");
 	}
 	proc_root.proc_dentry = dentry_ptr;
+	if (proc_mkdir(&proc_root, "thread_info"))
+		panic("proc init error\n");
 }
+INIT_FUN(proc_init, 2);

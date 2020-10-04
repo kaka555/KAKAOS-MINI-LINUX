@@ -5,6 +5,8 @@
 #include <double_linked_list.h>
 #include <sys_init_fun.h>
 
+struct device;
+
 #define PROC_FILE 0
 #define PROC_DIR  1
 
@@ -24,6 +26,7 @@ struct proc_dir_entry
 int proc_mkdir(struct proc_dir_entry *parent, const char *name);
 int proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops);
 void remove_proc_entry(struct proc_dir_entry *entry);
+int proc_meminfo_register(struct device *mem_dev);
 
 void __INIT proc_init(void);
 

@@ -68,5 +68,5 @@ void ka_putchar(const char ch)
 void bsp_init(void)
 {
 	USART_Config();
-	_bsp_init(device_array, sizeof(device_array) / sizeof(struct device));
+	_bsp_init(device_array, sizeof(device_array) / sizeof(device_array[0]));
 }
