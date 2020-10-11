@@ -1,4 +1,4 @@
-SRCS_y = command_processor.c shell.c shell_fun.c
+SRCS_y = command_processor.c shell.c shell_fun.c dmesg.c
 
 ASM_SRCS = 
 

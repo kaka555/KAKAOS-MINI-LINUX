@@ -9,6 +9,7 @@
 #include <shell.h>
 #include <os_cpu.h>
 #include <sys_init_fun.h>
+#include <dmesg.h>
 
 #if CONFIG_MODULE
 
@@ -40,28 +41,28 @@ void shell_modinfo(int argc, char const *argv[])
 	unsigned int i;
 	list_for_each_entry(dynamic_module_ptr, &module_list_head, module_list)
 	{
-		ka_printf("module name is %s\n", dynamic_module_ptr->name);
-		ka_printf("module state:");
+		pr_shell("module name is %s\n", dynamic_module_ptr->name);
+		pr_shell("module state:");
 		switch (dynamic_module_ptr->module_state)
 		{
 		default :
 			PRINTF("bad state num is %d\n", dynamic_module_ptr->module_state);
 			ASSERT(0, ASSERT_BAD_EXE_LOCATION); ka_printf("\n"); break;
 		case MODULE_STATE_INIT:
-			ka_printf("STATE_INIT\n"); break;
+			pr_shell("STATE_INIT\n"); break;
 		case MODULE_STATE_LOADED:
-			ka_printf("STATE_LOADED\n"); break;
+			pr_shell("STATE_LOADED\n"); break;
 		case MODULE_STATE_RUN:
-			ka_printf("MODULE_STATE_RUN\n"); break;
+			pr_shell("MODULE_STATE_RUN\n"); break;
 		}
-		ka_printf("module_space : 0x%p\n", dynamic_module_ptr->module_space);
-		ka_printf("module_size : %u\n", dynamic_module_ptr->module_size);
-		ka_printf("export symbols : \n");
+		pr_shell("module_space : 0x%p\n", dynamic_module_ptr->module_space);
+		pr_shell("module_size : %u\n", dynamic_module_ptr->module_size);
+		pr_shell("export symbols : \n");
 		for (i = 0; i < dynamic_module_ptr->export_symbols_num; ++i)
 		{
-			ka_printf("no.%u : %s\n", i + 1, dynamic_module_ptr->export_symbols_array[i].name);
+			pr_shell("no.%u : %s\n", i + 1, dynamic_module_ptr->export_symbols_array[i].name);
 		}
-		ka_printf("ref : %u\n", dynamic_module_ptr->ref);
+		pr_shell("ref : %u\n", dynamic_module_ptr->ref);
 	}
 }
 
@@ -82,9 +83,9 @@ void shell_list_module(int argc, char const *argv[])
 	list_for_each_entry(dynamic_module_ptr, &module_list_head, module_list)
 	{
 		++i;
-		ka_printf("module name is %s\n", dynamic_module_ptr->name);
+		pr_shell("module name is %s\n", dynamic_module_ptr->name);
 	}
-	ka_printf("total %u modules\n", i);
+	pr_shell("total %u modules\n", i);
 }
 
 /**

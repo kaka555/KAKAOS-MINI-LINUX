@@ -125,7 +125,7 @@ void shell_delay_heap_check(void)
 		TCB_ptr2 = heap_get_index_data(&delay_heap, i);
 		if (TIME_FIRST_SMALLER_THAN_SECOND(TCB_ptr1->delay_reach_time, TCB_ptr2->delay_reach_time))
 		{
-			ka_printf("heap member %u has incorrect position with member %u\n", i, i / 2);
+			pr_shell("heap member %u has incorrect position with member %u\n", i, i / 2);
 		}
 	}
 }

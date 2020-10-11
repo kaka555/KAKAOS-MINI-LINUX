@@ -357,26 +357,26 @@ void shell_mem_pool(int argc, char const *argv[])
 	mp *mp_ptr = mp_head;
 	if (NULL == mp_ptr)
 	{
-		ka_printf("no mem pool in os\n");
+		pr_shell("no mem pool in os\n");
 		return ;
 	}
 	while (mp_ptr)
 	{
-		ka_printf("mem pool's name is %s\n", mp_ptr->name);
-		ka_printf("mem pool is ");
+		pr_shell("mem pool's name is %s\n", mp_ptr->name);
+		pr_shell("mem pool is ");
 		if (mp_is_create(mp_ptr))
 		{
-			ka_printf("created\n");
+			pr_shell("created\n");
 		}
 		else
 		{
-			ka_printf("init\n");
+			pr_shell("init\n");
 		}
-		ka_printf("mem pool's start_add is %p\n", mp_ptr->start_add);
-		ka_printf("mem pool's end_add is %p\n", mp_ptr->end_add);
-		ka_printf("mem pool's full_block_num is %u\n", mp_ptr->full_block_num);
-		ka_printf("mem pool's block_size is %u\n", mp_ptr->block_size);
-		ka_printf("mem pool's current_block_num is %u\n", mp_ptr->current_block_num);
+		pr_shell("mem pool's start_add is %p\n", mp_ptr->start_add);
+		pr_shell("mem pool's end_add is %p\n", mp_ptr->end_add);
+		pr_shell("mem pool's full_block_num is %u\n", mp_ptr->full_block_num);
+		pr_shell("mem pool's block_size is %u\n", mp_ptr->block_size);
+		pr_shell("mem pool's current_block_num is %u\n", mp_ptr->current_block_num);
 		struct list_head *pos;
 		unsigned int i = 0;
 		list_for_each(pos, &mp_ptr->block_head)
@@ -384,8 +384,8 @@ void shell_mem_pool(int argc, char const *argv[])
 			++i;
 		}
 		ASSERT(i == mp_ptr->current_block_num, ASSERT_PARA_AFFIRM);
-		ka_printf("data num of mp_delay_insert_sort_list is %u\n",
-		          mp_ptr->mp_delay_insert_sort_list.data_num);
+		pr_shell("data num of mp_delay_insert_sort_list is %u\n",
+		         mp_ptr->mp_delay_insert_sort_list.data_num);
 		mp_ptr = mp_ptr->next_mem_pool_ptr;
 	}
 }

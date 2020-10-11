@@ -53,9 +53,9 @@ include $(HOME)/.ka_config
 SUB_DIR =  src/kernel testcase
 
 $(TARGET): $(SUB_DIR)
-	echo "LIBPATH is $(LIBPATH)"
-	echo "LDFLAGS is $(LDFLAGS)"
-	$(LD)  $(^:=/$(SUB_TGT)) -T $(SCRIPT) $(LDFLAGS) -nostartfiles -nodefaultlibs -nostdlib --gc-sections -o $@ -static $(LIBPATH) -lgcc
+	@echo "LIBPATH is $(LIBPATH)"
+	@echo "LDFLAGS is $(LDFLAGS)"
+	$(LD)  $(^:=/$(SUB_TGT)) -T $(SCRIPT) $(LDFLAGS) -nostartfiles -nodefaultlibs -nostdlib --gc-sections -Map KAKAOS.map -o $@ -static $(LIBPATH) -lgcc
 	$(OBJCOPY) $(TARGET)  $(TARGET:.elf=.bin) -Obinary
 	$(OBJCOPY) $(TARGET)  $(TARGET:.elf=.hex) -Oihex
 

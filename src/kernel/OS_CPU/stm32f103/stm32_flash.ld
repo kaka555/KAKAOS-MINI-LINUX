@@ -74,6 +74,10 @@ SECTIONS
 	KEEP(*(.RTMSymTab))
 	_ka_module_symtab_end = .;
 	
+	_ka_setup_fun_begin = .;
+	KEEP(*(.CmdlineSetup))
+	_ka_setup_fun_end = .;
+	
 	_ka_init_fun_begin1 = .;
 	KEEP(*(.INIT_FUN1))
 	_ka_init_fun_end1 = .;
@@ -135,6 +139,11 @@ SECTIONS
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
 	*(.ramfunctions)
+	
+	. = ALIGN(4);
+	*(.dmesg.data) 
+	. = ALIGN(4);
+	
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
   } >RAM

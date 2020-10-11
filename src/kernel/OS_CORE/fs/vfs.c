@@ -10,6 +10,7 @@
 #include <command_processor.h>
 #include <shell.h>
 #include <fs.h>
+#include <dmesg.h>
 
 extern int default_open(struct file *file_ptr);
 extern int default_close(struct file *file_ptr);
@@ -675,11 +676,11 @@ void shell_pwd(int argc, char const *argv[])
 	ASSERT(NULL != dentry_ptr, ASSERT_PARA_AFFIRM);
 	if (dentry_ptr == (dentry_ptr->d_parent)) /* root */
 	{
-		ka_printf("/\n");
+		pr_shell("/\n");
 		return ;
 	}
 	pwd(dentry_ptr->d_parent);
-	ka_printf("%s\n", dentry_ptr->name);
+	pr_shell("%s\n", dentry_ptr->name);
 	return ;
 }
 
@@ -705,7 +706,7 @@ void shell_ls(int argc, char const *argv[])
 	{
 		list_for_each_entry(dentry_ptr, head, child)
 		{
-			ka_printf("%s\t", dentry_ptr->name);
+			pr_shell("%s\t", dentry_ptr->name);
 		}
 	}
 	else if (2 == argc)
@@ -714,33 +715,33 @@ void shell_ls(int argc, char const *argv[])
 		{
 			if (0 == ka_strcmp(argv[1], dentry_ptr->name))
 			{
-				ka_printf("%s\t%u|%u|%u|%u|%u|%u|%u\t%u|%u\t%u", dentry_ptr->name, dentry_ptr->ref,
-				          shell_ls_helper(dentry_not_releasse(dentry_ptr)),
-				          shell_ls_helper(is_folder(dentry_ptr)),
-				          shell_ls_helper(dentry_need_refresh(dentry_ptr)),
-				          shell_ls_helper(dentry_name_not_changable(dentry_ptr)),
-				          shell_ls_helper(inode_is_soft(dentry_ptr->d_inode)),
-				          shell_ls_helper(inode_is_dev(dentry_ptr->d_inode)),
-				          shell_ls_helper(inode_readable(dentry_ptr->d_inode)),
-				          shell_ls_helper(inode_writable(dentry_ptr->d_inode)),
-				          shell_ls_helper(inode_is_dirty(dentry_ptr->d_inode))
-				         );
+				pr_shell("%s\t%u|%u|%u|%u|%u|%u|%u\t%u|%u\t%u", dentry_ptr->name, dentry_ptr->ref,
+				         shell_ls_helper(dentry_not_releasse(dentry_ptr)),
+				         shell_ls_helper(is_folder(dentry_ptr)),
+				         shell_ls_helper(dentry_need_refresh(dentry_ptr)),
+				         shell_ls_helper(dentry_name_not_changable(dentry_ptr)),
+				         shell_ls_helper(inode_is_soft(dentry_ptr->d_inode)),
+				         shell_ls_helper(inode_is_dev(dentry_ptr->d_inode)),
+				         shell_ls_helper(inode_readable(dentry_ptr->d_inode)),
+				         shell_ls_helper(inode_writable(dentry_ptr->d_inode)),
+				         shell_ls_helper(inode_is_dirty(dentry_ptr->d_inode))
+				        );
 				break ;
 			}
 		}
 	}
 	else
 	{
-		ka_printf("parameter error");
+		pr_shell("parameter error");
 	}
-	ka_printf("\n");
+	pr_shell("\n");
 }
 
 void shell_cd(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	if (0 == ka_strcmp("..", argv[1]))
@@ -756,7 +757,7 @@ void shell_cd(int argc, char const *argv[])
 	struct dentry *dentry_ptr = _find_dentry(argv[1]);
 	if ((NULL == dentry_ptr) || (!is_folder(dentry_ptr)))
 	{
-		ka_printf("path error\n");
+		pr_shell("path error\n");
 		return ;
 	}
 	current_dentry_ptr = dentry_ptr;
@@ -764,7 +765,7 @@ void shell_cd(int argc, char const *argv[])
 	{
 		if (dentry_ptr->d_inode->inode_ops->refresh(dentry_ptr->d_inode, dentry_ptr) < 0)
 		{
-			ka_printf("disk refresh error\n");
+			pr_shell("disk refresh error\n");
 			return ;
 		}
 		KA_WARN(DEBUG_TYPE_VFS, "dentry refresh\n");
@@ -782,13 +783,13 @@ void shell_touch(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	int ret = __add_file(current_dentry_ptr, argv[1], NULL);
 	if ((ret < 0) && (-ERROR_LOGIC != ret))
 	{
-		ka_printf("create file fail\n");
+		pr_shell("create file fail\n");
 		return ;
 	}
 	update_para_arv_vector();
@@ -801,20 +802,20 @@ void shell_cat(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	struct file *file_ptr = NULL;
 	struct dentry *dentry_ptr = _find_dentry(argv[1]);
 	if (NULL == dentry_ptr)
 	{
-		ka_printf("path error\n");
+		pr_shell("path error\n");
 		return ;
 	}
 	int error = __open(dentry_ptr, FILE_FLAG_READONLY, (const struct file **)&file_ptr);
 	if (error < 0)
 	{
-		ka_printf("open file fail\n");
+		pr_shell("open file fail\n");
 		return ;
 	}
 	ASSERT(NULL != file_ptr, ASSERT_PARA_AFFIRM);
@@ -826,14 +827,14 @@ void shell_cat(int argc, char const *argv[])
 	void *buffer = ka_malloc(file_ptr->file_len);
 	if (NULL == buffer)
 	{
-		ka_printf("allocate room for display error\n");
+		pr_shell("allocate room for display error\n");
 		return ;
 	}
 	error = _read(file_ptr, buffer, file_ptr->file_len, FILE_CURRENT);
-	ka_printf("%s\n", (char *)buffer);
+	pr_shell("%s\n", (char *)buffer);
 	if (error < 0)
 	{
-		ka_printf("read fail\n");
+		pr_shell("read fail\n");
 	}
 	ka_free(buffer);
 	_close(file_ptr);
@@ -843,18 +844,18 @@ void shell_rename(int argc, char const *argv[])
 {
 	if (3 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	struct dentry *dentry_ptr = _get_subdir(current_dentry_ptr, argv[1], ka_strlen(argv[2]));
 	if (NULL == dentry_ptr)
 	{
-		ka_printf("file name error\n");
+		pr_shell("file name error\n");
 		return ;
 	}
 	if (_rename(dentry_ptr, argv[2]) < 0)
 	{
-		ka_printf("rename fail\n");
+		pr_shell("rename fail\n");
 	}
 }
 
@@ -865,13 +866,13 @@ void shell_mkdir(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	int ret = __add_folder(current_dentry_ptr, argv[1], NULL);
 	if ((ret < 0) && (-ERROR_LOGIC != ret))
 	{
-		ka_printf("create folder fail\n");
+		pr_shell("create folder fail\n");
 		return ;
 	}
 	update_para_arv_vector();
@@ -881,7 +882,7 @@ void shell_rm(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	delete_file(argv[1]);
@@ -892,7 +893,7 @@ void shell_rmdir(int argc, char const *argv[])
 {
 	if (2 != argc)
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	delete_folder(argv[1]);
@@ -929,24 +930,24 @@ void shell_vfs_echo(char const *argv[])
 	struct file *file_ptr = NULL;
 	if ((0 != ka_strcmp(">", argv[2])) && (0 != ka_strcmp(">>", argv[2])))
 	{
-		ka_printf("command error\n");
+		pr_shell("command error\n");
 		return ;
 	}
 	if (0 == ka_strlen(argv[1]))
 	{
-		ka_printf("parameter error\n");
+		pr_shell("parameter error\n");
 		return ;
 	}
 	struct dentry *dentry_ptr = _find_dentry(argv[3]);
 	if (NULL == dentry_ptr)
 	{
-		ka_printf("path error\n");
+		pr_shell("path error\n");
 		return ;
 	}
 	error = __open(dentry_ptr, FILE_FLAG_WRITEONLY, (const struct file **)&file_ptr);
 	if (error < 0)
 	{
-		ka_printf("open file fail\n");
+		pr_shell("open file fail\n");
 		return ;
 	}
 	ASSERT(NULL != file_ptr, ASSERT_PARA_AFFIRM);
@@ -961,7 +962,7 @@ void shell_vfs_echo(char const *argv[])
 	}
 	if (error < 0)
 	{
-		ka_printf("write fail\n");
+		pr_shell("write fail\n");
 	}
 	_close(file_ptr);
 }

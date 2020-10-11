@@ -5,6 +5,8 @@
 #define do_nothing()  NULL
 #define __section(S) __attribute__ ((__section__(S)))
 
+#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+
 typedef int bool;
 
 #define IS_ERR_VALUE(x) ((x) <= (long)0)

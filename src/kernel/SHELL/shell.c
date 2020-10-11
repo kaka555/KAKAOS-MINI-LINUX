@@ -18,6 +18,7 @@
 #include <sys_init_fun.h>
 #include <vfs.h>
 #include <mem_pool.h>
+#include <dmesg.h>
 
 /* this file do the main job of shell */
 
@@ -68,7 +69,7 @@ void _shell_buffer_wait_str(const char *str_ptr) /* thread will going to sleep*/
 		{
 			return ;
 		}
-		ka_printf("wrong input\n");
+		pr_shell("wrong input\n");
 		clear_input_buffer();
 	}
 }
@@ -134,7 +135,7 @@ static void deal_with_tab(void)
 	struct command_processer *command_processer_ptr = _get_command_processer(ka_strlen(using_shell_buffer_ptr->argv[0]));
 	if (NULL == command_processer_ptr)
 	{
-		ka_printf("command not found\n");
+		pr_shell("command not found\n");
 		return ;
 	}
 	KA_WARN(DEBUG_TYPE_SHELL_TAB, "command_processer length is %u\n", command_processer_ptr->command_length);
@@ -174,7 +175,7 @@ static void deal_with_tab(void)
 				ka_strcpy(using_shell_buffer_ptr->buffer + using_shell_buffer_ptr->index,
 				          struct_command_ptr->para_arv[index] + len);
 				using_shell_buffer_ptr->index += ka_strlen(struct_command_ptr->para_arv[index]) - len;
-				ka_printf("%s", struct_command_ptr->para_arv[index] + len);
+				pr_shell("%s", struct_command_ptr->para_arv[index] + len);
 			}
 			return ;
 		}
@@ -215,8 +216,8 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 	            ('+' == c)	|| ('=' == c)  || ('/' == c)  ||
 	            (0x09 == c) || ('>' == c)))
 	{
-		ka_printf("\nerror input\n");
-		ka_printf("%s", using_shell_buffer_ptr->buffer);
+		pr_shell("\nerror input\n");
+		pr_shell("%s", using_shell_buffer_ptr->buffer);
 		return ;
 	}
 	if (0x08 == c) /* backspace key*/
@@ -224,7 +225,7 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 		if (using_shell_buffer_ptr->index > 0)
 		{
 			--(using_shell_buffer_ptr->index);
-			ka_printf("\b \b");
+			pr_shell("\b \b");
 		}
 		else
 		{
@@ -241,7 +242,7 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 	}
 	else if (0x0d == c) /* enter */
 	{
-		ka_printf("\n");
+		pr_shell("\n");
 		using_shell_buffer_ptr->buffer[(using_shell_buffer_ptr->index)++] = 0x0d;
 		using_shell_buffer_ptr->buffer[using_shell_buffer_ptr->index] = '\0';
 		KA_WARN(DEBUG_TYPE_SHELL, "%s\n", using_shell_buffer_ptr->buffer);
@@ -250,13 +251,13 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 	}
 	if (using_shell_buffer_ptr->index < using_shell_buffer_ptr->buffer_size)
 	{
-		ka_putchar(c); /* echo */
+		ka_putchar(c, KERN_SHELL_LEVEL); /* echo */
 		using_shell_buffer_ptr->buffer[(using_shell_buffer_ptr->index)++] = c;
 		using_shell_buffer_ptr->buffer[using_shell_buffer_ptr->index] = '\0';
 	}
 	else
 	{
-		ka_printf("\ntoo long,invalid input,clear buffer...\n");
+		pr_shell("\ntoo long,invalid input,clear buffer...\n");
 		using_shell_buffer_ptr->index = 0;
 		return ;
 	}
@@ -304,19 +305,19 @@ static void redo(int argc, char const *argv[])
 	{
 		unsigned int i;
 		ASSERT(using_shell_buffer_ptr->index_reserve < BUFFER_SIZE, ASSERT_PARA_AFFIRM);
-		ka_printf("redo command: ");
+		pr_shell("redo command: ");
 		for (i = 0; i < using_shell_buffer_ptr->index_reserve; ++i)
 		{
-			ka_puts((const char *)(using_shell_buffer_ptr->argv_reserve)[i]);
+			ka_puts((const char *)(using_shell_buffer_ptr->argv_reserve)[i], KERN_SHELL_LEVEL);
 		}
-		ka_putchar('\n');
+		ka_putchar('\n', KERN_SHELL_LEVEL);
 		_match_and_execute_command(using_shell_buffer_ptr->index_reserve,
 		                           (const char **)(using_shell_buffer_ptr->argv_reserve),
 		                           _get_command_processer(ka_strlen((using_shell_buffer_ptr->argv_reserve)[0])));
 	}
 	else
 	{
-		ka_printf("no reserved buffer,command not saved\n");
+		pr_shell("no reserved buffer,command not saved\n");
 	}
 }
 
@@ -665,7 +666,7 @@ static unsigned int _process(char *buffer_ptr)
 				using_shell_buffer_ptr->argv[num++] = ptr;
 				if (ARGV_SIZE + 1 == num)
 				{
-					ka_printf("too many argument\n");
+					pr_shell("too many argument\n");
 					return ARGV_SIZE;
 				}
 			}
@@ -713,12 +714,12 @@ void shell(void *para)
 	(void)para;
 	int result;
 	shell_pre();
-	ka_printf("%s\n", "/*************************");
-	ka_printf("%s\n", "*");
-	ka_printf("%s\n", "*   kaka_os  shell");
-	ka_printf("%s\n", "*");
-	ka_printf("%s\n", "*************************/");
-	ka_printf("%s", "kaka_os>>");
+	pr_shell("%s\n", "/*************************");
+	pr_shell("%s\n", "*");
+	pr_shell("%s\n", "*   kaka_os  shell");
+	pr_shell("%s\n", "*");
+	pr_shell("%s\n", "*************************/");
+	pr_shell("%s", "kaka_os>>");
 	while (1)
 	{
 #if CONFIG_ASSERT_DEBUG
@@ -743,7 +744,7 @@ void shell(void *para)
 			using_shell_buffer_ptr->index_reserve = result;
 		}
 		clear_input_buffer();
-		ka_printf("%s", "kaka_os>>");
+		pr_shell("%s", "kaka_os>>");
 	}
 
 }

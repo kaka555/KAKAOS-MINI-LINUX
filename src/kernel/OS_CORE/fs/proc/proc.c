@@ -3,6 +3,7 @@
 #include <os_error.h>
 #include <myMicroLIB.h>
 #include <myassert.h>
+#include <bsp.h>
 
 /*
 	all proc_dir_entry should be allocated except proc root
@@ -30,10 +31,12 @@ static void proc_dir_entry_init(int mode,
 {
 	ASSERT(proc_dir_entry_ptr != NULL, ASSERT_INPUT);
 	ASSERT(fops != NULL, ASSERT_INPUT);
-	ASSERT(parent != NULL, ASSERT_INPUT);
+	if (!parent)
+		parent = &proc_root;
 	proc_dir_entry_ptr->mode = mode;
 	proc_dir_entry_ptr->fops = fops;
 	proc_dir_entry_ptr->parent = parent;
+	proc_dir_entry_ptr->name = (char *)(proc_dir_entry_ptr + 1);
 	ka_strcpy(proc_dir_entry_ptr->name, name);
 	proc_dir_entry_ptr->name[ka_strlen(name)] = '\0';
 }
@@ -92,13 +95,19 @@ void remove_proc_entry(struct proc_dir_entry *entry)
 
 void __INIT proc_init(void)
 {
+	int i;
+	const struct bsp_device *bsp_device_ptr;
 	struct dentry *dentry_ptr = ___add_folder(&root_dentry, proc_root.name, proc_root.fops);
-	if (PTR_ERR(dentry_ptr)) {
+	if (IS_ERR(dentry_ptr)) {
 		panic("proc create fail\n");
 		ASSERT(1, "should never go here\n");
 	}
 	proc_root.proc_dentry = dentry_ptr;
 	if (proc_mkdir(&proc_root, "thread_info"))
 		panic("proc init error\n");
+	for_each_bsp_device(i, bsp_device_ptr) {
+		if (DEV_MEM == bsp_device_ptr->head.type)
+			proc_meminfo_register(bsp_device_ptr);
+	}
 }
 INIT_FUN(proc_init, 2);

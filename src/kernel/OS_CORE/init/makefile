@@ -1,15 +1,8 @@
-SRCS = 
+SRCS = ${shell ls *.c}
 
 ASM_SRCS = 
 
-SUB_DIR_y = schedule ipc init
-
-SUB_DIR_$(CONFIG_MODULE) += dmodule
-SUB_DIR_$(CONFIG_VFS) += fs
-
-ifeq ($(findstring y, $(CONFIG_TIME_EN) $(CONFIG_TIMER_EN)), y)
-SUB_DIR_y += time
-endif
+SUB_DIR_y =
 
 $(SUB_TGT): $(SRCS:.c=.o) $(ASM_SRCS:.S=.o) $(SUB_DIR_y)
 	$(LD) $(SRCS:.c=.o) $(ASM_SRCS:.S=.o) $(SUB_DIR_y:=/$(SUB_TGT)) $(LDFLAG)  -r -o $@

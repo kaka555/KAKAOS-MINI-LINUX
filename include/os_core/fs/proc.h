@@ -4,6 +4,7 @@
 #include <vfs.h>
 #include <double_linked_list.h>
 #include <sys_init_fun.h>
+#include <bsp.h>
 
 struct device;
 
@@ -16,17 +17,16 @@ struct proc_dir_entry
 	int mode; /* a dir or file */
 	struct file_operations *fops;
 	struct proc_dir_entry *parent;
-
+	struct dentry *proc_dentry;
 //	struct list_head sibling_entry;
 //	struct list_head subdir;
 	char *name;
-	struct dentry *proc_dentry;
 };
 
 int proc_mkdir(struct proc_dir_entry *parent, const char *name);
 int proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops);
 void remove_proc_entry(struct proc_dir_entry *entry);
-int proc_meminfo_register(struct device *mem_dev);
+int proc_meminfo_register(const struct bsp_device *mem_dev);
 
 void __INIT proc_init(void);
 

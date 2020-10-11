@@ -129,7 +129,7 @@ void shell_check_os_ready(void)
 			if (!ready_table[i])
 			{
 				++num;
-				ka_printf("ready_group's bit %d error with ready_table[%d]\n", i, i);
+				pr_shell("ready_group's bit %d error with ready_table[%d]\n", i, i);
 			}
 		}
 	}
@@ -151,17 +151,17 @@ void shell_check_os_ready(void)
 					if (!(0x01 & (ready_table[i / (8 * sizeof(READY_TABLE_TYPE))] >> (i % (8 * sizeof(READY_TABLE_TYPE))))))
 					{
 						++num;
-						ka_printf("priority %d's map error\n", i);
+						pr_shell("priority %d's map error\n", i);
 					}
 				}
 			}
 			if (list_entry(head, struct TCB_list, head)->ready_num != ready_TCB_num)
 			{
-				ka_printf("priority %d's ready_num error\n", i);
+				pr_shell("priority %d's ready_num error\n", i);
 			}
 			if (list_entry(head, struct TCB_list, head)->TCB_num != TCB_num)
 			{
-				ka_printf("priority %d's TCB_num error\n", i);
+				pr_shell("priority %d's TCB_num error\n", i);
 			}
 		}
 	}
@@ -182,7 +182,7 @@ void shell_check_os_ready(void)
 					}
 				}
 				++num;
-				ka_printf("priority %d error\n", j + i * 8 * sizeof(READY_TABLE_TYPE));
+				pr_shell("priority %d error\n", j + i * 8 * sizeof(READY_TABLE_TYPE));
 			}
 out:
 			;
@@ -191,7 +191,7 @@ out:
 	/*conclusion*/
 	if (num)
 	{
-		ka_printf("checking complete....%u error\n", num);
+		pr_shell("checking complete....%u error\n", num);
 	}
 }
 #endif

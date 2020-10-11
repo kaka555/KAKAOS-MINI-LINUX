@@ -2,12 +2,12 @@
 #define _BSP_H
 #include <kakaosstdint.h>
 
-enum device_type{
+enum device_type {
 	DEV_NORMAL	= 0,
 	DEV_MEM		= 1
 };
 
-struct dev_normal{
+struct bsp_dev_normal {
 	void (*init_fun)(void);
 };
 
@@ -18,33 +18,38 @@ enum mem_type
 	TYPE_SYS /* the os data store in memory with prio PRIO_SYS */
 };
 
-struct dev_mem_para{
+struct dev_mem_para {
 	unsigned int prio;
 	enum mem_type type;
 	UINT32 size; /*KB  must be 2^n*/
 	void *start;
 };
 
-struct dev_mem{
+struct bsp_dev_mem {
 	void (*init_fun)(const struct dev_mem_para *para);
 	const struct dev_mem_para *para;
 };
 
-struct device_head{
+struct bsp_device_head {
 	const char *dev_name;
 	const char *dev_info;
 	enum device_type type;
 };
 
-struct device
+struct bsp_device
 {
-	struct device_head head;
-	union{
-		struct dev_normal normal;
-		struct dev_mem mem;
-	}u;
+	struct bsp_device_head head;
+	union {
+		struct bsp_dev_normal normal;
+		struct bsp_dev_mem mem;
+	} u;
 };
 
-void _bsp_init(const struct device *device_array,unsigned int num);
+void _bsp_init(const struct bsp_device *device_array, unsigned int num);
+
+extern const struct bsp_device *device_array_ptr;
+extern unsigned int bsp_device_num;
+#define for_each_bsp_device(index, device) \
+	for(index = 0; (index < bsp_device_num) && (device = &device_array_ptr[index]); ++index)
 
 #endif

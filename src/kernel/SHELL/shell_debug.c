@@ -45,8 +45,8 @@ void insert_break_point(const char* file_name, unsigned line, const char* functi
 #endif
 	if (flag_for_shell_debug)
 	{
-		ka_printf("program stop,now going to file: %s,line %u,function name is %s\n", file_name, line, function_name);
-		ka_printf("%s", "kaka_os>>");
+		pr_shell("program stop,now going to file: %s,line %u,function name is %s\n", file_name, line, function_name);
+		pr_shell("%s", "kaka_os>>");
 #if CONFIG_ASSERT_DEBUG
 		error = _p(&MCB_for_shell_debug, MCB_FLAG_WAIT, 0);
 #else
@@ -116,7 +116,7 @@ void shell_debug_info(int argc, char const *argv[])
 			singly_list_for_each(pos, &variable_array[i])
 			{
 				buffer = singly_list_entry(pos, struct shell_variable, list);
-				ka_printf("shell_variable's name is \"%s\"\n", buffer->shell_v_name);
+				pr_shell("shell_variable's name is \"%s\"\n", buffer->shell_v_name);
 			}
 		}
 	}
@@ -200,24 +200,24 @@ void shell_v_display(struct shell_variable *shell_variable_ptr)
 	case SHELL_V_TYPE_UINT8:
 	case SHELL_V_TYPE_UINT16:
 	case SHELL_V_TYPE_UINT32:
-		ka_printf("%u\n", *(unsigned int*)shell_variable_ptr->data_ptr);
+		pr_shell("%u\n", *(unsigned int*)shell_variable_ptr->data_ptr);
 		break ;
 
 	case SHELL_V_TYPE_INT8:
 	case SHELL_V_TYPE_INT16:
 	case SHELL_V_TYPE_INT32:
-		ka_printf("%d\n", *(int*)shell_variable_ptr->data_ptr);
+		pr_shell("%d\n", *(int*)shell_variable_ptr->data_ptr);
 		break ;
 
 	case SHELL_V_TYPE_FLOAT:
-		ka_printf("%f\n", *(float*)shell_variable_ptr->data_ptr);
+		pr_shell("%f\n", *(float*)shell_variable_ptr->data_ptr);
 		break;
 	case SHELL_V_TYPE_DOUBLE:
-		ka_printf("%f\n", *(double*)shell_variable_ptr->data_ptr);
+		pr_shell("%f\n", *(double*)shell_variable_ptr->data_ptr);
 		break ;
 
 	case SHELL_V_TYPE_CHAR:
-		ka_printf("%c\n", *(char*)shell_variable_ptr->data_ptr);
+		pr_shell("%c\n", *(char*)shell_variable_ptr->data_ptr);
 		break ;
 
 	default :
@@ -229,7 +229,7 @@ void shell_v_display(struct shell_variable *shell_variable_ptr)
 void shell_v_display_addr(struct shell_variable *shell_variable_ptr)
 {
 	ASSERT(shell_variable_ptr != NULL, ASSERT_INPUT);
-	ka_printf("variable %s address is %p\n", shell_variable_ptr->shell_v_name, shell_variable_ptr->data_ptr);
+	pr_shell("variable %s address is %p\n", shell_variable_ptr->shell_v_name, shell_variable_ptr->data_ptr);
 }
 
 void shell_v_write(struct shell_variable *shell_variable_ptr, const char *input_buffer_ptr)

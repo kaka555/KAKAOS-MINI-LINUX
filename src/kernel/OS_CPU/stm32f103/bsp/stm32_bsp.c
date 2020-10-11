@@ -17,7 +17,7 @@ static const struct dev_mem_para para2 = {
 	.type = TYPE_NORMAL,
 };
 
-static const struct device device_array[] = {
+static const struct bsp_device device_array[] = {
 
 	{
 		.head.dev_name = "USART1",
@@ -59,7 +59,7 @@ static const struct device device_array[] = {
 	*/
 };
 
-void ka_putchar(const char ch)
+void bsp_putchar(char ch)
 {
 	USART_SendData(DEBUG_USARTx, ch);
 	while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);

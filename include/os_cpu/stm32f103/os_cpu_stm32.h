@@ -8,9 +8,9 @@ typedef  volatile  CPU_INT32U  CPU_REG32;
 typedef  CPU_INT32U            CPU_SR;
 
 #define  NVIC_INT_CTRL         *((CPU_REG32 *)0xE000ED04)
-#define  NVIC_PENDSVSET        0x10000000   
+#define  NVIC_PENDSVSET        0x10000000
 #define  NVIC_SYSPRI14         *((CPU_REG32 *)0xE000ED22)
-#define  NVIC_PENDSV_PRI       0xFF 
+#define  NVIC_PENDSV_PRI       0xFF
 #define  OSIntCtxSw()          NVIC_INT_CTRL = NVIC_PENDSVSET
 
 #define  DEF_INT_32U_MAX_VAL        4294967295u
@@ -18,7 +18,7 @@ typedef  CPU_INT32U            CPU_SR;
 #define  DEF_OCTET_MASK             0xFFu
 #define  OS_CPU_CFG_SYSTICK_PRIO    0u
 
-#define  CPU_REG_NVIC_ST_CTRL                     (*((CPU_REG32 *)(0xE000E010))) 
+#define  CPU_REG_NVIC_ST_CTRL                     (*((CPU_REG32 *)(0xE000E010)))
 #define  CPU_REG_NVIC_ST_CTRL_COUNTFLAG           0x00010000
 #define  CPU_REG_NVIC_ST_CTRL_CLKSOURCE           0x00000004
 #define  CPU_REG_NVIC_ST_CTRL_TICKINT             0x00000002
@@ -50,11 +50,12 @@ typedef  CPU_INT32U            CPU_SR;
 
 void CPU_IntDis(void);
 void CPU_IntEn(void);
-void set_register(void **stack_ptr,void *entry_ptr,void *return_ptr,void *para);
+void set_register(void **stack_ptr, void *entry_ptr, void *return_ptr, void *para);
 void __init_systick(void);
 void __init_svc(void);
 CPU_SR      CPU_SR_Save      (void);
-void        CPU_SR_Restore   (CPU_SR   cpu_sr);
+void        CPU_SR_Restore   (CPU_SR cpu_sr);
 void bsp_init(void);
+void bsp_putchar(char ch);
 
 #endif

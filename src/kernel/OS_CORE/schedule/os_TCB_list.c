@@ -109,7 +109,7 @@ void shell_check_TCB_list(void)
 	{
 		if (!list_empty(&TCB_list[i].head))
 		{
-			ka_printf("prio %u has task:\n", i);
+			pr_shell("prio %u has task:\n", i);
 			list_for_each(pos, &TCB_list[i].head)
 			{
 				TCB_ptr = list_entry(pos, TCB, same_prio_list);
@@ -118,41 +118,41 @@ void shell_check_TCB_list(void)
 				{
 					++ready_num;
 				}
-				ka_printf("name: %s\n", TCB_ptr->name);
-				ka_printf("timeslice_hope_time: %d\n", TCB_ptr->timeslice_hope_time);
-				ka_printf("stack: 0x%p\n", (void *)TCB_ptr->stack);
-				ka_printf("stack_size: %d\n", TCB_ptr->stack_size);
-				ka_printf("stack-base: 0x%p\n", (void *)TCB_ptr->stack_end);
-				ka_printf("task_state: ");
+				pr_shell("name: %s\n", TCB_ptr->name);
+				pr_shell("timeslice_hope_time: %d\n", TCB_ptr->timeslice_hope_time);
+				pr_shell("stack: 0x%p\n", (void *)TCB_ptr->stack);
+				pr_shell("stack_size: %d\n", TCB_ptr->stack_size);
+				pr_shell("stack-base: 0x%p\n", (void *)TCB_ptr->stack_end);
+				pr_shell("task_state: ");
 				switch (TCB_ptr->task_state)
 				{
 				case STATE_READY:
-					ka_printf("STATE_READY\n"); break;
+					pr_shell("STATE_READY\n"); break;
 				case STATE_DELAY:
 				case STATE_WAIT_MCB_TIMEOUT:
 				case STATE_WAIT_MESSAGE_QUEUE_TIMEOUT:
 				case STATE_PUT_MESSAGE_QUEUE_TIMEOUT:
 				case STATE_WAIT_MEM_POOL_TIMEOUT:
-					ka_printf("STATE_DELAY\n");
-					ka_printf("delay reach time is %lu\n", (unsigned long)TCB_ptr->delay_reach_time);
+					pr_shell("STATE_DELAY\n");
+					pr_shell("delay reach time is %lu\n", (unsigned long)TCB_ptr->delay_reach_time);
 					break;
 				case STATE_SUSPEND_NORMAL:
 				case STATE_WAIT_MCB_FOREVER:
 				case STATE_WAIT_MESSAGE_QUEUE_FOREVER:
 				case STATE_PUT_MESSAGE_QUEUE_FOREVER:
 				case STATE_WAIT_MUTEX_FOREVER:
-					ka_printf("STATE_SUSPEND\n"); break;
+					pr_shell("STATE_SUSPEND\n"); break;
 				}
-				ka_printf("/*****************************************************/\n");
+				pr_shell("/*****************************************************/\n");
 			}
 #if CONFIG_DEBUG_ON
 			if (TCB_num != TCB_list[i].TCB_num)
 			{
-				ka_printf("prio %u TCB_num error!\n", i);
+				pr_shell("prio %u TCB_num error!\n", i);
 			}
 			if (ready_num != TCB_list[i].ready_num)
 			{
-				ka_printf("prio %u ready_num error!\n", i);
+				pr_shell("prio %u ready_num error!\n", i);
 			}
 #endif
 			ready_num = 0;
@@ -179,13 +179,13 @@ void shell_stack_check(int argc, char const *argv[])
 				unsigned int num = 0;
 				TCB_ptr = list_entry(pos, TCB, same_prio_list);
 				unsigned int *ptr = (unsigned int *)(TCB_ptr->stack_end);
-				ka_printf("=====================================================\n");
-				ka_printf("task name : %s\n", TCB_ptr->name);
-				ka_printf("The stack space is from 0x%p to 0x%p\n", TCB_ptr->stack_end, (STACK_TYPE *)TCB_ptr->stack_end + TCB_ptr->stack_size / 4);
+				pr_shell("=====================================================\n");
+				pr_shell("task name : %s\n", TCB_ptr->name);
+				pr_shell("The stack space is from 0x%p to 0x%p\n", TCB_ptr->stack_end, (STACK_TYPE *)TCB_ptr->stack_end + TCB_ptr->stack_size / 4);
 #if CONFIG_DEBUG_ON
 				if (0 != *(unsigned int *)(TCB_ptr->stack_end))
 				{
-					ka_printf("stack full!!!!\n");
+					pr_shell("stack full!!!!\n");
 					ASSERT(0, ASSERT_BAD_EXE_LOCATION);
 				}
 #endif
@@ -195,11 +195,11 @@ void shell_stack_check(int argc, char const *argv[])
 					++ptr;
 					if ((char *)ptr == (char *)(TCB_ptr->stack_end) + TCB_ptr->stack_size)
 					{
-						ka_printf("stack empty!!!!\n");
+						pr_shell("stack empty!!!!\n");
 						break;
 					}
 				}
-				ka_printf("It's stack used rate is %d%%\n", 100 - 400 * num / TCB_ptr->stack_size);
+				pr_shell("It's stack used rate is %d%%\n", 100 - 400 * num / TCB_ptr->stack_size);
 			}
 		}
 	}
@@ -221,29 +221,29 @@ void shell_show_tasks_registers(int argc, char const *argv[])
 			list_for_each_entry(TCB_ptr, &TCB_list[i].head, same_prio_list)
 			{
 				const UINT32 *reg = (unsigned int *)(TCB_ptr->stack);
-				ka_printf("=====================================================\n");
-				ka_printf("task name : %s\n", TCB_ptr->name);
+				pr_shell("=====================================================\n");
+				pr_shell("task name : %s\n", TCB_ptr->name);
 				if (0 == ka_strcmp(TCB_ptr->name, "shell"))
 				{
-					ka_printf("now show task shell's register is volatile\n");
+					pr_shell("now show task shell's register is volatile\n");
 					continue;
 				}
-				ka_printf("R4 	= 	0x%x\n", *reg++);
-				ka_printf("R5 	= 	0x%x\n", *reg++);
-				ka_printf("R6 	= 	0x%x\n", *reg++);
-				ka_printf("R7 	= 	0x%x\n", *reg++);
-				ka_printf("R8 	= 	0x%x\n", *reg++);
-				ka_printf("R9 	= 	0x%x\n", *reg++);
-				ka_printf("R10 	= 	0x%x\n", *reg++);
-				ka_printf("R11 	= 	0x%x\n", *reg++);
-				ka_printf("xPSR	=	0x%x\n", *reg++);
-				ka_printf("PC 	= 	0x%x\n", *reg++);
-				ka_printf("R12 	= 	0x%x\n", *reg++);
-				ka_printf("R3 	= 	0x%x\n", *reg++);
-				ka_printf("R2 	= 	0x%x\n", *reg++);
-				ka_printf("R1 	= 	0x%x\n", *reg++);
-				ka_printf("R0 	= 	0x%x\n", *reg);
-				ka_printf("=====================================================\n");
+				pr_shell("R4 	= 	0x%x\n", *reg++);
+				pr_shell("R5 	= 	0x%x\n", *reg++);
+				pr_shell("R6 	= 	0x%x\n", *reg++);
+				pr_shell("R7 	= 	0x%x\n", *reg++);
+				pr_shell("R8 	= 	0x%x\n", *reg++);
+				pr_shell("R9 	= 	0x%x\n", *reg++);
+				pr_shell("R10 	= 	0x%x\n", *reg++);
+				pr_shell("R11 	= 	0x%x\n", *reg++);
+				pr_shell("xPSR	=	0x%x\n", *reg++);
+				pr_shell("PC 	= 	0x%x\n", *reg++);
+				pr_shell("R12 	= 	0x%x\n", *reg++);
+				pr_shell("R3 	= 	0x%x\n", *reg++);
+				pr_shell("R2 	= 	0x%x\n", *reg++);
+				pr_shell("R1 	= 	0x%x\n", *reg++);
+				pr_shell("R0 	= 	0x%x\n", *reg);
+				pr_shell("=====================================================\n");
 			}
 		}
 	}

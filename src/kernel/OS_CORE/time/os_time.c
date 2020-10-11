@@ -83,8 +83,8 @@ void _system_time_display(void)
 {
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	ka_printf("%d年%d月%d日--%d时%d分%d秒--星期%d\r\n", sys_time.year,
-	          sys_time.month, sys_time.date, sys_time.hour, sys_time.minute, sys_time.second, sys_time.day);
+	pr_shell("%d年%d月%d日--%d时%d分%d秒--星期%d\r\n", sys_time.year,
+	         sys_time.month, sys_time.date, sys_time.hour, sys_time.minute, sys_time.second, sys_time.day);
 	CPU_CRITICAL_EXIT();
 }
 

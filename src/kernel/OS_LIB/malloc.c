@@ -492,51 +492,38 @@ void shell_check_kmem(int argc, char const *argv[])
 	CPU_CRITICAL_ENTER();
 	singly_list_for_each_entry(kmem_cache_ptr, &cache_chain_head, node)
 	{
-		ka_printf("===========get NO.%d kmem===========\n", ++i);
-		ka_printf("the size of this kmem_cache is %u\n", kmem_cache_ptr->kmem_cache_slab_size);
-		if (!list_empty(&kmem_cache_ptr->slabs_full))
-		{
+		pr_shell("===========get NO.%d kmem===========\n", ++i);
+		pr_shell("the size of this kmem_cache is %u\n", kmem_cache_ptr->kmem_cache_slab_size);
+		if (!list_empty(&kmem_cache_ptr->slabs_full)) {
 			struct list_head *buffer;
 			int num = 0;
-			list_for_each(buffer, &kmem_cache_ptr->slabs_full)
-			{
+			list_for_each(buffer, &kmem_cache_ptr->slabs_full) {
 				++num;
 			}
-			ka_printf("chain slabs_full has %d slab\n", num);
+			pr_shell("chain slabs_full has %d slab\n", num);
+		} else {
+			pr_shell("chain slabs_full is empty\n");
 		}
-		else
-		{
-			ka_printf("chain slabs_full is empty\n");
-		}
-		if (!list_empty(&kmem_cache_ptr->slabs_partial))
-		{
+		if (!list_empty(&kmem_cache_ptr->slabs_partial)) {
 			struct list_head *buffer;
 			int num = 0;
 			list_for_each(buffer, &kmem_cache_ptr->slabs_partial)
-			{
-				++num;
-			}
-			ka_printf("chain slabs_partial has %d slab\n", num);
+			++num;
+			pr_shell("chain slabs_partial has %d slab\n", num);
+		} else {
+			pr_shell("chain slabs_partial is empty\n");
 		}
-		else
-		{
-			ka_printf("chain slabs_partial is empty\n");
-		}
-		if (!list_empty(&kmem_cache_ptr->slabs_empty))
-		{
+		if (!list_empty(&kmem_cache_ptr->slabs_empty)) {
 			struct list_head *buffer;
 			int num = 0;
-			list_for_each(buffer, &kmem_cache_ptr->slabs_empty)
-			{
+			list_for_each(buffer, &kmem_cache_ptr->slabs_empty) {
 				++num;
 			}
-			ka_printf("chain slabs_empty has %d slab\n", num);
+			pr_shell("chain slabs_empty has %d slab\n", num);
+		} else {
+			pr_shell("chain slabs_empty is empty\n");
 		}
-		else
-		{
-			ka_printf("chain slabs_empty is empty\n");
-		}
-		ka_printf("\n");
+		pr_shell("\n");
 	}
 	CPU_CRITICAL_EXIT();
 }
@@ -625,86 +612,84 @@ void shell_check_slab(int argc, char const *argv[])
 	CPU_CRITICAL_ENTER();
 	singly_list_for_each_entry(kmem_cache_ptr, &cache_chain_head, node)
 	{
-		ka_printf("===========get NO.%d kmem===========\n", ++i);
-		ka_printf("the size of this kmem_cache is %u\n", kmem_cache_ptr->kmem_cache_slab_size);
+		pr_shell("===========get NO.%d kmem===========\n", ++i);
+		pr_shell("the size of this kmem_cache is %u\n", kmem_cache_ptr->kmem_cache_slab_size);
 		if (!list_empty(&kmem_cache_ptr->slabs_full))
 		{
 			struct list_head *buffer;
 			unsigned int num = 0;
-			ka_printf("in chain slabs_full\n");
+			pr_shell("in chain slabs_full\n");
 			list_for_each(buffer, &kmem_cache_ptr->slabs_full)
 			{
-				ka_printf("the NO.%u slab information:\n", ++num);
+				pr_shell("the NO.%u slab information:\n", ++num);
 				const struct slab *slab_ptr = list_entry(buffer, struct slab, slab_chain);
-				ka_printf("start_ptr is %x\n", (int)slab_ptr->start_ptr);
-				ka_printf("end_ptr is %x\n", (int)slab_ptr->end_ptr);
-				ka_printf("current_block_num is %d\n", slab_ptr->current_block_num);
-				ka_printf("full_block_num is %d\n", slab_ptr->full_block_num);
-				ka_printf("block_size is %d\n", slab_ptr->block_size);
-				ka_printf("\n");
+				pr_shell("start_ptr is %x\n", (int)slab_ptr->start_ptr);
+				pr_shell("end_ptr is %x\n", (int)slab_ptr->end_ptr);
+				pr_shell("current_block_num is %d\n", slab_ptr->current_block_num);
+				pr_shell("full_block_num is %d\n", slab_ptr->full_block_num);
+				pr_shell("block_size is %d\n", slab_ptr->block_size);
+				pr_shell("\n");
 #if CONFIG_DEBUG_ON
 				slab_list_check(slab_ptr);
 #endif
 			}
-			ka_printf("chain slabs_full has %d slab\n", num);
+			pr_shell("chain slabs_full has %d slab\n", num);
 		}
 		else
 		{
-			ka_printf("chain slabs_full is empty\n");
+			pr_shell("chain slabs_full is empty\n");
 		}
-		ka_printf("\n");
+		pr_shell("\n");
 		if (!list_empty(&kmem_cache_ptr->slabs_partial))
 		{
 			struct list_head *buffer;
 			unsigned int num = 0;
-			ka_printf("in chain slabs_partial\n");
+			pr_shell("in chain slabs_partial\n");
 			list_for_each(buffer, &kmem_cache_ptr->slabs_partial)
 			{
-				ka_printf("the NO.%u slab information:\n", ++num);
+				pr_shell("the NO.%u slab information:\n", ++num);
 				const struct slab *slab_ptr = list_entry(buffer, struct slab, slab_chain);
-				ka_printf("start_ptr is %x\n", (int)slab_ptr->start_ptr);
-				ka_printf("end_ptr is %x\n", (int)slab_ptr->end_ptr);
-				ka_printf("current_block_num is %d\n", slab_ptr->current_block_num);
-				ka_printf("full_block_num is %d\n", slab_ptr->full_block_num);
-				ka_printf("block_size is %d\n", slab_ptr->block_size);
-				ka_printf("\n");
+				pr_shell("start_ptr is %x\n", (int)slab_ptr->start_ptr);
+				pr_shell("end_ptr is %x\n", (int)slab_ptr->end_ptr);
+				pr_shell("current_block_num is %d\n", slab_ptr->current_block_num);
+				pr_shell("full_block_num is %d\n", slab_ptr->full_block_num);
+				pr_shell("block_size is %d\n", slab_ptr->block_size);
+				pr_shell("\n");
 #if CONFIG_DEBUG_ON
 				slab_list_check(slab_ptr);
 #endif
 			}
-			ka_printf("chain slabs_partial has %d slab\n", num);
+			pr_shell("chain slabs_partial has %d slab\n", num);
 		}
 		else
 		{
-			ka_printf("chain slabs_partial is empty\n");
+			pr_shell("chain slabs_partial is empty\n");
 		}
-		ka_printf("\n");
+		pr_shell("\n");
 		if (!list_empty(&kmem_cache_ptr->slabs_empty))
 		{
 			struct list_head *buffer;
 			unsigned int num = 0;
-			ka_printf("in chain slabs_empty\n");
+			pr_shell("in chain slabs_empty\n");
 			list_for_each(buffer, &kmem_cache_ptr->slabs_empty)
 			{
-				ka_printf("the NO.%u slab information:\n", ++num);
+				pr_shell("the NO.%u slab information:\n", ++num);
 				const struct slab *slab_ptr = list_entry(buffer, struct slab, slab_chain);
-				ka_printf("start_ptr is %x\n", (int)slab_ptr->start_ptr);
-				ka_printf("end_ptr is %x\n", (int)slab_ptr->end_ptr);
-				ka_printf("current_block_num is %d\n", slab_ptr->current_block_num);
-				ka_printf("full_block_num is %d\n", slab_ptr->full_block_num);
-				ka_printf("block_size is %d\n", slab_ptr->block_size);
-				ka_printf("\n");
+				pr_shell("start_ptr is %x\n", (int)slab_ptr->start_ptr);
+				pr_shell("end_ptr is %x\n", (int)slab_ptr->end_ptr);
+				pr_shell("current_block_num is %d\n", slab_ptr->current_block_num);
+				pr_shell("full_block_num is %d\n", slab_ptr->full_block_num);
+				pr_shell("block_size is %d\n", slab_ptr->block_size);
+				pr_shell("\n");
 #if CONFIG_DEBUG_ON
 				slab_list_check(slab_ptr);
 #endif
 			}
-			ka_printf("chain slabs_empty has %d slab\n", num);
+			pr_shell("chain slabs_empty has %d slab\n", num);
+		} else {
+			pr_shell("chain slabs_empty is empty\n");
 		}
-		else
-		{
-			ka_printf("chain slabs_empty is empty\n");
-		}
-		ka_printf("\n");
+		pr_shell("\n");
 	}
 	CPU_CRITICAL_EXIT();
 }

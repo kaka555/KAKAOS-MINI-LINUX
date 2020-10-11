@@ -3,9 +3,10 @@
 #include <bsp.h>
 #include <os_error.h>
 #include <myassert.h>
+#include <printf_debug.h>
 
 static char mem_name[] = {'m', 'e', 'm', '0', '\0'};
-static struct device *mem_dev_array[10];
+static const struct bsp_device *mem_dev_array[10];
 
 static inline unsigned int get_mem_dev_index(const char *name)
 {
@@ -27,16 +28,17 @@ static struct file_operations proc_meminfo_fops = {
 	.open = meminfo_open,
 };
 
-int proc_meminfo_register(struct device *mem_dev)
+int proc_meminfo_register(const struct bsp_device *mem_dev)
 {
 	static int mem_num = 0;
 	int ret;
+	MARK();
 	if (mem_num >= 10)
 		return -ERROR_SYS;
 	mem_name[3] = i2c(mem_num);
 	ret = proc_creat(NULL, mem_name, &proc_meminfo_fops);
 	if (ret)
-		return ret;
+		panic("proc %s create fail\n", mem_name);
 	mem_dev_array[mem_num] = mem_dev;
 	++mem_num;
 	return 0;
