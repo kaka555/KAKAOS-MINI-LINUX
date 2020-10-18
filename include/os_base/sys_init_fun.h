@@ -14,10 +14,20 @@ struct init_fun
 	init_fun_type fun;
 };
 
-#define INIT_FUN(function,level)	\
+#define _INIT_FUN(function,level)	\
 const struct init_fun __init_fun_##function __section(".INIT_FUN" #level) = \
 {	\
 	.fun = function,\
 }
+
+#define INIT_FUN(function,level) _INIT_FUN(function,level)
+
+#define DRIVER_INIT_LEVEL 4
+#define DRIVER_INIT_FUN(function)	\
+	INIT_FUN(function, DRIVER_INIT_LEVEL)
+
+#define DEV_INIT_LEVEL 5
+#define DEV_INIT_FUN(function)	\
+	INIT_FUN(function, DEV_INIT_LEVEL)
 
 #endif

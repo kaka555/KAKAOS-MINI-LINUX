@@ -15,22 +15,26 @@
 #define KERN_SOH	"\001"
 #define KERN_SOH_ASCII	'\001'
 
-#define KERN_EMERG	KERN_SOH "0"	/* system is unusable */
-#define KERN_ALERT	KERN_SOH "1"	/* action must be taken immediately */
-#define KERN_CRIT	KERN_SOH "2"	/* critical conditions */
-#define KERN_ERR	KERN_SOH "3"	/* error conditions */
-#define KERN_WARNING	KERN_SOH "4"	/* warning conditions */
-#define KERN_NOTICE	KERN_SOH "5"	/* normal but significant condition */
-#define KERN_INFO	KERN_SOH "6"	/* informational */
-#define KERN_DEBUG	KERN_SOH "7"	/* debug-level messages */
+#define KERN_PROMPT KERN_SOH "0"	/* shell prompt */
+#define KERN_EMERG	KERN_SOH "1"	/* system is unusable */
+#define KERN_ALERT	KERN_SOH "2"	/* action must be taken immediately */
+#define KERN_CRIT	KERN_SOH "3"	/* critical conditions */
+#define KERN_ERR	KERN_SOH "4"	/* error conditions */
+#define KERN_WARNING	KERN_SOH "5"	/* warning conditions */
+#define KERN_NOTICE	KERN_SOH "6"	/* normal but significant condition */
+#define KERN_INFO	KERN_SOH "7"	/* informational */
+#define KERN_DEBUG	KERN_SOH "8"	/* debug-level messages */
 
-#define KERN_DEFAULT_LEVEL	4
+#define KERN_PROMPT_LEVEL	0
+#define KERN_DEFAULT_LEVEL	5
 #define KERN_SHELL	KERN_EMERG
 #define KERN_BOOT	KERN_EMERG
-#define KERN_SHELL_LEVEL	0
+#define KERN_SHELL_LEVEL	1
 
 #define KERN_DEFAULT	KERN_SOH "d"	/* the default kernel loglevel */
 
+#define pr_prompt(fmt, ...) \
+	ka_printf(KERN_PROMPT pr_fmt(fmt), ##__VA_ARGS__)
 #define pr_emerg(fmt, ...) \
 	ka_printf(KERN_EMERG pr_fmt(fmt), ##__VA_ARGS__)
 #define pr_alert(fmt, ...) \
@@ -61,7 +65,7 @@ static inline int printk_get_level(const char **text)
 	const char *buffer = *text;
 	if (buffer[0] == KERN_SOH_ASCII && buffer[1]) {
 		switch (buffer[1]) {
-		case '0' ... '7':
+		case '0' ... '8':
 			*text = (*text) + 2;
 			return c2i(buffer[1]);
 		}

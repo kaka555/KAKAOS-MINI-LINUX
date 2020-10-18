@@ -18,6 +18,7 @@
 #include <sys_init_fun.h>
 #include <printf_debug.h>
 #include <cmdline.h>
+#include <console.h>
 
 #if CONFIG_SHELL_EN
 static TCB TCB_shell;
@@ -55,6 +56,10 @@ extern unsigned long _ka_init_fun_begin2;
 extern unsigned long _ka_init_fun_end2;
 extern unsigned long _ka_init_fun_begin3;
 extern unsigned long _ka_init_fun_end3;
+extern unsigned long _ka_init_fun_begin4;
+extern unsigned long _ka_init_fun_end4;
+extern unsigned long _ka_init_fun_begin5;
+extern unsigned long _ka_init_fun_end5;
 
 /**
  * @Author      kaka
@@ -64,8 +69,10 @@ extern unsigned long _ka_init_fun_end3;
  */
 static void __INIT os_init(void)
 {
-	bsp_init();
-	pr_debug("finish bsp_init()\n");
+	early_bsp_init(); //early device init
+	early_console_init();
+	bsp_putchar('c');
+	pr_debug("finish early_bsp_init()\n");
 	cmdline_parse();
 	pr_debug("finish cmdline_parse()\n");
 
@@ -78,19 +85,28 @@ static void __INIT os_init(void)
 	struct init_fun *struct_init_fun_ptr;
 	for (struct_init_fun_ptr = (struct init_fun *)(&_ka_init_fun_begin1);
 	        struct_init_fun_ptr != (struct init_fun *)(&_ka_init_fun_end1); ++struct_init_fun_ptr)
-	{
 		(*(struct_init_fun_ptr->fun))(); /* execute all the init function */
-	}
+
 	for (struct_init_fun_ptr = (struct init_fun *)(&_ka_init_fun_begin2);
 	        struct_init_fun_ptr != (struct init_fun *)(&_ka_init_fun_end2); ++struct_init_fun_ptr)
-	{
 		(*(struct_init_fun_ptr->fun))(); /* execute all the init function */
-	}
+
 	for (struct_init_fun_ptr = (struct init_fun *)(&_ka_init_fun_begin3);
 	        struct_init_fun_ptr != (struct init_fun *)(&_ka_init_fun_end3); ++struct_init_fun_ptr)
-	{
+
 		(*(struct_init_fun_ptr->fun))(); /* execute all the init function */
-	}
+
+	for (struct_init_fun_ptr = (struct init_fun *)(&_ka_init_fun_begin4);
+	        struct_init_fun_ptr != (struct init_fun *)(&_ka_init_fun_end4); ++struct_init_fun_ptr)
+		(*(struct_init_fun_ptr->fun))(); /* here we input device_drivers into system */
+
+	for (struct_init_fun_ptr = (struct init_fun *)(&_ka_init_fun_begin5);
+	        struct_init_fun_ptr != (struct init_fun *)(&_ka_init_fun_end5); ++struct_init_fun_ptr)
+		(*(struct_init_fun_ptr->fun))(); /* here we input device_drivers into system */
+
+	console_init();
+	pr_debug("console init success\n");
+	//mem_clear();
 }
 
 /**

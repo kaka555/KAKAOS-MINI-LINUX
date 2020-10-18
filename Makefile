@@ -32,10 +32,11 @@ export HEAD_DIR10 = ${HOME}/include/os_core/dmodule
 export HEAD_DIR11 = ${HOME}/include/os_core/fs
 export HEAD_DIR12 = ${HOME}/include/os_core/ipc
 export HEAD_DIR13 = ${HOME}/include/os_core/time
+export HEAD_DIR14 = ${HOME}/include/os_drivers
 
 export INCLUDE = -I$(HEAD_DIR1) -I$(HEAD_DIR2) -I$(HEAD_DIR3) -I$(HEAD_DIR4) -I$(HEAD_DIR5) \
                  -I$(HEAD_DIR6) -I$(HEAD_DIR7) -I$(HEAD_DIR8) -I$(HEAD_DIR9) -I$(HEAD_DIR10) \
-				 -I$(HEAD_DIR11) -I$(HEAD_DIR12) -I$(HEAD_DIR13) \
+				 -I$(HEAD_DIR11) -I$(HEAD_DIR12) -I$(HEAD_DIR13) -I$(HEAD_DIR14) \
 
 OPTIMIZE = O0
 
@@ -50,7 +51,7 @@ LDFLAGS :=
 include $(HOME)/config.mk
 include $(HOME)/.ka_config
 ########################################################################
-SUB_DIR =  src/kernel testcase
+SUB_DIR =  src/kernel src/drivers testcase
 
 $(TARGET): $(SUB_DIR)
 	@echo "LIBPATH is $(LIBPATH)"

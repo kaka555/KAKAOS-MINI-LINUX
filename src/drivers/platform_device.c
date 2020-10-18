@@ -166,7 +166,7 @@ struct bus_type platform_bus = {
 	.remove = platflom_remove,
 };
 
-void __INIT platform_bus_register(void)
+static void __INIT platform_bus_register(void)
 {
 	bus_init(&platform_bus, "platform_bus", NULL);
 }

@@ -115,4 +115,9 @@ static inline int rdwr_device_register(const struct device *dev)
 	return device_register(dev, FLAG_INODE_READ | FLAG_INODE_WRITE);
 }
 
+static inline int device_has_matched(const struct device *dev)
+{
+	return (dev->driver_ptr != NULL);
+}
+
 #endif

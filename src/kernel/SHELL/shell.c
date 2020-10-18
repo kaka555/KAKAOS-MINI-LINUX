@@ -483,6 +483,10 @@ static struct command resident_command_5[] =
 		.f = shell_rmdir,
 	}
 #endif
+	, {
+		.command_name = "dmesg",
+		.f = shell_dmesg,
+	}
 };
 static struct command resident_command_6[] =
 {
@@ -716,7 +720,7 @@ void shell(void *para)
 	shell_pre();
 	pr_shell("%s\n", "/*************************");
 	pr_shell("%s\n", "*");
-	pr_shell("%s\n", "*   kaka_os  shell");
+	pr_shell("%s\n", "*   kaka_os_mini_linux  shell");
 	pr_shell("%s\n", "*");
 	pr_shell("%s\n", "*************************/");
 	pr_shell("%s", "kaka_os>>");
@@ -738,9 +742,7 @@ void shell(void *para)
 			unsigned int i;
 			unsigned int buf = (unsigned int)(using_shell_buffer_ptr->buffer_reserve) - (unsigned int)(using_shell_buffer_ptr->buffer);
 			for (i = 0; i < (unsigned int)result; ++i)
-			{
 				using_shell_buffer_ptr->argv_reserve[i] += buf;
-			}
 			using_shell_buffer_ptr->index_reserve = result;
 		}
 		clear_input_buffer();

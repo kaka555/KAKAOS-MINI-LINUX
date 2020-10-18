@@ -3,9 +3,10 @@
 #include <kakaosstdint.h>
 #include <myMicroLIB.h>
 #include <dmesg.h>
+#include <printf_debug.h>
 
 //#define CMDLINE "console=uart1 mem=0x20000000,64k"
-#define CMDLINE ""
+#define CMDLINE "console=uart1"
 
 #define for_each_command(start) \
 for (start = CMDLINE_SETUP_START; start != CMDLINE_SETUP_END; start += sizeof(struct cmdline_setup))

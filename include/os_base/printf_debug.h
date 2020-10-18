@@ -39,7 +39,7 @@
 			while(1);\
 		}while(0)
 
-#define MARK() pr_emerg("file_name: %s\tline_num: %u\ntfunction_name: %s\n", \
+#define MARK() pr_emerg("file_name: %s\tline_num: %u\tfunction_name: %s\n", \
 				__FILE__,__LINE__,__FUNCTION__);
 
 #endif

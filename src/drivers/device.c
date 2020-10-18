@@ -23,8 +23,6 @@ int driver_init(struct device_driver *driver_ptr,
 {
 	ASSERT(NULL != driver_ptr, ASSERT_INPUT);
 	ASSERT(NULL != driver_name, ASSERT_INPUT);
-	ASSERT(NULL != driver_ptr->probe, ASSERT_INPUT);
-	ASSERT(NULL != driver_ptr->remove, ASSERT_INPUT);
 	ASSERT(NULL != driver_ptr->fops, ASSERT_INPUT);
 	driver_ptr->name = driver_name;
 	INIT_LIST_HEAD(&driver_ptr->device_list);

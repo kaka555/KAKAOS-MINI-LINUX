@@ -1,4 +1,4 @@
-SRCS = device.c vfs.c vfs_default_fun.c vfsio.c kobject.c
+SRCS = vfs.c vfs_default_fun.c vfsio.c kobject.c
 
 ASM_SRCS = 
 

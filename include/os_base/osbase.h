@@ -36,4 +36,8 @@ static inline int c2i(char c)
 	return (c + (1 - '1'));
 }
 
+
+#define likely(x)	__builtin_expect(!!(x), 1)
+#define unlikely(x)	__builtin_expect(!!(x), 0)
+
 #endif

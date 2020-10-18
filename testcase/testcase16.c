@@ -40,7 +40,7 @@ static struct file_operations fop = {
 
 void three(void *para)
 {
-	if (writeonly_device_register("usart2", &fop) < 0)
+	if (wo_device_register("usart2", &fop) < 0)
 	{
 		ka_printf("device register error\n");
 	}

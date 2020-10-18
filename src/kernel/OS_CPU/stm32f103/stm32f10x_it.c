@@ -35,6 +35,7 @@
 #include <slab.h>
 #include <os_time.h>
 #include <dmesg.h>
+#include <console.h>
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
   */
@@ -187,7 +188,8 @@ void DEBUG_USART_IRQHandler(void)
 
   if (USART_GetITStatus(DEBUG_USARTx, USART_IT_RXNE) != RESET)
   {
-    _put_in_shell_buffer(USART_ReceiveData(DEBUG_USARTx));
+    char c = USART_ReceiveData(DEBUG_USARTx);
+    console_read(&c, 1);
   }
 
   SYS_EXIT_INTERRUPT();

@@ -90,6 +90,14 @@ SECTIONS
 	KEEP(*(.INIT_FUN3))
 	_ka_init_fun_end3 = .;
 	
+	_ka_init_fun_begin4 = .;
+	KEEP(*(.INIT_FUN4))
+	_ka_init_fun_end4 = .;
+	
+	_ka_init_fun_begin5 = .;
+	KEEP(*(.INIT_FUN5))
+	_ka_init_fun_end5 = .;
+	
 	KEEP (*(.init))
     KEEP (*(.fini))
 
