@@ -4,12 +4,13 @@
 #include <double_linked_list.h>
 #include <TCB.h>
 
-struct TCB_list{
+struct TCB_list {
 	struct list_head head;
 	unsigned char ready_num;
 	unsigned char TCB_num;
 };
 
+TCB *find_TCB_with_name(const char *name);
 void _register_in_TCB_list(TCB *TCB_ptr);
 int _delete_from_TCB_list(TCB *TCB_ptr);
 struct list_head *_get_from_TCB_list(unsigned int index);

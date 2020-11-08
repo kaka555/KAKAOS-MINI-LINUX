@@ -11,6 +11,20 @@ use array to mark TCB with different priority
 
 static struct TCB_list TCB_list[PRIO_MAX];
 
+TCB *find_TCB_with_name(const char *name)
+{
+	TCB *TCB_ptr;
+	int i;
+	for (i = 0; i < PRIO_MAX; ++i) {
+		list_for_each_entry(TCB_ptr, &TCB_list[i].head, same_prio_list) {
+			if (0 == ka_strcmp(TCB_ptr->name, name)) {
+				return TCB_ptr;
+			}
+		}
+	}
+	return NULL;
+}
+
 static void __INIT __init_TCB_list(void)
 {
 	int i;

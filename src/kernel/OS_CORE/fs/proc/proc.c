@@ -16,7 +16,7 @@ static struct proc_dir_entry proc_root = {
 	.name = "proc",
 };
 
-static void proc_dir_entry_init(int mode,
+static void proc_dir_entry_init(long mode,
                                 struct proc_dir_entry *proc_dir_entry_ptr,
                                 struct file_operations *fops,
                                 struct proc_dir_entry *parent,
@@ -26,7 +26,7 @@ static void proc_dir_entry_init(int mode,
 	ASSERT(fops != NULL, ASSERT_INPUT);
 	if (!parent)
 		parent = &proc_root;
-	proc_dir_entry_ptr->mode = mode;
+	set_proc_entry_mode(proc_dir_entry_ptr, mode);
 	proc_dir_entry_ptr->fops = fops;
 	proc_dir_entry_ptr->parent = parent;
 	proc_dir_entry_ptr->name = (char *)(proc_dir_entry_ptr + 1);

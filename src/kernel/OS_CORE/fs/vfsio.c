@@ -118,13 +118,11 @@ int _read(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_fro
 {
 	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0), ASSERT_INPUT);
 	ASSERT(file_ptr->offset <= file_ptr->file_len, ASSERT_PARA_AFFIRM);
-	if (!(file_ptr->f_mode & FILE_MODE_READ))
-	{
-		KA_WARN(CONFIG_VFS, "file %s cannot be read\n", file_ptr->f_den->name);
+	if (!(file_ptr->f_mode & FILE_MODE_READ)) {
+		pr_shell("file %s cannot be read\n", file_ptr->f_den->name);
 		return -ERROR_LOGIC;
 	}
-	if (file_ptr->f_op->read)
-	{
+	if (file_ptr->f_op->read) {
 		unsigned int offset_backup = file_ptr->offset;
 		switch (offset_flag)
 		{
@@ -139,15 +137,13 @@ int _read(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_fro
 			break ;
 		}
 		int offset = file_ptr->f_op->read(file_ptr, buffer, len, file_ptr->offset);
-		if (offset < 0)
-		{
+		if (offset < 0) {
 			file_ptr->offset = offset_backup;
 			KA_WARN(CONFIG_VFS, "f_op->read fail\n");
 			return offset;
 		}
 		KA_WARN(CONFIG_VFS, "read data is %s\n", (char *)buffer);
-		if (inode_is_soft(file_ptr->f_den->d_inode))
-		{
+		if (inode_is_soft(file_ptr->f_den->d_inode)) {
 			file_ptr->offset += offset;
 		}
 		ASSERT(file_ptr->offset <= file_ptr->file_len, ASSERT_PARA_AFFIRM);
@@ -159,13 +155,9 @@ int _read(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_fro
 int ka_read(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_from offset_flag)
 {
 	if ((NULL == file_ptr) || (NULL == buffer))
-	{
 		return -ERROR_NULL_INPUT_PTR;
-	}
 	if (0 == len)
-	{
 		return -ERROR_USELESS_INPUT;
-	}
 	return _read(file_ptr, buffer, len, offset_flag);
 }
 EXPORT_SYMBOL(ka_read);
@@ -174,13 +166,11 @@ int _write(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_fr
 {
 	ASSERT((NULL != file_ptr) && (NULL != buffer) && (len > 0), ASSERT_INPUT);
 	ASSERT(file_ptr->offset <= file_ptr->file_len, ASSERT_PARA_AFFIRM);
-	if (!(file_ptr->f_mode & FILE_MODE_WRITE))
-	{
+	if (!(file_ptr->f_mode & FILE_MODE_WRITE)) {
 		KA_WARN(CONFIG_VFS, "file %s cannot be written\n", file_ptr->f_den->name);
 		return -ERROR_LOGIC;
 	}
-	if (file_ptr->f_op->write)
-	{
+	if (file_ptr->f_op->write) {
 		unsigned int offset_backup = file_ptr->offset;
 		switch (offset_flag)
 		{
@@ -195,8 +185,7 @@ int _write(struct file *file_ptr, void *buffer, unsigned int len, enum llseek_fr
 			break ;
 		}
 		int offset = file_ptr->f_op->write(file_ptr, buffer, len, file_ptr->offset);
-		if (offset < 0)
-		{
+		if (offset < 0) {
 			KA_WARN(CONFIG_VFS, "f_op->write fail\n");
 			file_ptr->offset = offset_backup;
 

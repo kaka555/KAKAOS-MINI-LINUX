@@ -327,24 +327,18 @@ struct dentry *_find_dentry(const char *path)
 	ASSERT(NULL != path, ASSERT_INPUT);
 	struct dentry *dentry_ptr;
 	char *cur_path;
-	if ('/' == *path)
-	{
+	if ('/' == *path) {
 		dentry_ptr = &root_dentry;
 		cur_path = (char *)(path + 1);
-	}
-	else
-	{
+	} else {
 		dentry_ptr = current_dentry_ptr;
 		cur_path = (char *)(path);
 	}
 	unsigned int name_len = _get_subdir_name_len(cur_path);
-	while (0 != name_len) /* not the last dentry */
-	{
+	while (0 != name_len) { /* not the last dentry */
 		dentry_ptr = _get_subdir(dentry_ptr, cur_path, name_len);
 		if (NULL == dentry_ptr) /* no such dentry */
-		{
 			return NULL;
-		}
 		cur_path += name_len + 1;
 		name_len = _get_subdir_name_len(cur_path);
 	}
@@ -357,8 +351,7 @@ struct dentry *___add_folder(struct dentry *target_dentry_ptr, const char *folde
 	ASSERT(is_folder(target_dentry_ptr), "make sure is folder\n");
 	unsigned int len = ka_strlen(folder_name) + 1;
 	char *name_buffer = ka_malloc(len);
-	if (NULL == name_buffer)
-	{
+	if (NULL == name_buffer) {
 		KA_WARN(DEBUG_TYPE_VFS, "name_buffer malloc fail\n");
 		goto out3;
 	}
@@ -366,23 +359,17 @@ struct dentry *___add_folder(struct dentry *target_dentry_ptr, const char *folde
 	name_buffer[len - 1] = '\0';
 	struct inode *inode_ptr;
 	if (file_operations_ptr)
-	{
 		inode_ptr = _inode_alloc_and_init(target_dentry_ptr->d_inode->inode_ops,
 		                                  file_operations_ptr, target_dentry_ptr->d_inode->flag);
-	}
 	else
-	{
 		inode_ptr = _inode_alloc_and_init(target_dentry_ptr->d_inode->inode_ops,
 		                                  target_dentry_ptr->d_inode->i_f_ops, target_dentry_ptr->d_inode->flag);
-	}
-	if (NULL == inode_ptr)
-	{
+	if (NULL == inode_ptr) {
 		KA_WARN(DEBUG_TYPE_VFS, "inode malloc fail\n");
 		goto out2;
 	}
 	struct dentry *buffer = _folder_dentry_alloc_and_init(target_dentry_ptr, inode_ptr, name_buffer, FLAG_DENTRY_DEFAULT | FLAG_NEED_REFLASH);
-	if (NULL == buffer)
-	{
+	if (NULL == buffer) {
 		KA_WARN(DEBUG_TYPE_VFS, "dentry malloc fail\n");
 		goto out1;
 	}
@@ -650,13 +637,12 @@ static struct command *command_rename_ptr = NULL;
 static void pwd(struct dentry *dentry_ptr)
 {
 	ASSERT(is_folder(dentry_ptr), ASSERT_PARA_AFFIRM);
-	if (dentry_ptr == (dentry_ptr->d_parent)) /* root */
-	{
-		ka_printf("/");
+	if (dentry_ptr == (dentry_ptr->d_parent)) { /* root */
+		pr_shell("/");
 		return ;
 	}
 	pwd(dentry_ptr->d_parent);
-	ka_printf("%s/", dentry_ptr->name);
+	pr_shell("%s/", dentry_ptr->name);
 	return ;
 }
 
@@ -674,8 +660,7 @@ void shell_pwd(int argc, char const *argv[])
 	(void)argv;
 	struct dentry *dentry_ptr = current_dentry_ptr;
 	ASSERT(NULL != dentry_ptr, ASSERT_PARA_AFFIRM);
-	if (dentry_ptr == (dentry_ptr->d_parent)) /* root */
-	{
+	if (dentry_ptr == (dentry_ptr->d_parent)) { /* root */
 		pr_shell("/\n");
 		return ;
 	}
@@ -702,15 +687,10 @@ void shell_ls(int argc, char const *argv[])
 	ASSERT(NULL != current_dentry_ptr, ASSERT_PARA_AFFIRM);
 	struct dentry *dentry_ptr;
 	struct list_head *head = &current_dentry_ptr->subdirs;
-	if (1 == argc)
-	{
+	if (1 == argc) {
 		list_for_each_entry(dentry_ptr, head, child)
-		{
 			pr_shell("%s\t", dentry_ptr->name);
-		}
-	}
-	else if (2 == argc)
-	{
+	} else if (2 == argc) {
 		list_for_each_entry(dentry_ptr, head, child)
 		{
 			if (0 == ka_strcmp(argv[1], dentry_ptr->name))
@@ -729,9 +709,7 @@ void shell_ls(int argc, char const *argv[])
 				break ;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		pr_shell("parameter error");
 	}
 	pr_shell("\n");
@@ -800,15 +778,13 @@ void shell_touch(int argc, char const *argv[])
  */
 void shell_cat(int argc, char const *argv[])
 {
-	if (2 != argc)
-	{
+	if (2 != argc) {
 		pr_shell("command error\n");
 		return ;
 	}
 	struct file *file_ptr = NULL;
 	struct dentry *dentry_ptr = _find_dentry(argv[1]);
-	if (NULL == dentry_ptr)
-	{
+	if (NULL == dentry_ptr) {
 		pr_shell("path error\n");
 		return ;
 	}

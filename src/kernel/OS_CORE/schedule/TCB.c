@@ -36,31 +36,54 @@ void delete_myself(void)
 
 int task_info_open(struct file *file_ptr)
 {
+	const char *name = file_ptr->f_den->d_parent->name;
+	TCB *TCB_ptr = find_TCB_with_name(name);
+	if (NULL == TCB_ptr)
+		return -ERROR_LOGIC;
+	file_ptr->private_data = TCB_ptr;
+	/*we do not have dentry_ptr->d_inode->inode_ops->get_size
+	  so change file_len here */
+	file_ptr->file_len = 1;
+	return 0;
 }
 
-int task_info_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
+static int task_prio_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
 {
-
+	TCB *TCB_ptr = file_ptr->private_data;
+	pr_shell("prio: %u\n", TCB_ptr->prio);
+	return len;
 }
 
-static struct file_operations proc_task_info_fops = {
+static struct file_operations proc_task_info_prio_fops = {
 	.open = task_info_open,
-	.read = task_info_read,
+	.read = task_prio_read,
 };
 
-static int create_task_proc(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
+static int create_task_info(TCB *TCB_ptr, struct proc_dir_entry *parent)
 {
-	char *prio_str = ka_malloc(3);
-	struct proc_dir_entry * ret;
-	if (NULL == prio_str)
-		return -ERROR_NO_MEM;
-	ka_sprintf(prio_str,"%u",prio);
-	ret = proc_creat(NULL, prio_str, &proc_task_info_fops);
-	if (IS_ERR(ret)) {
-		ka_free(prio_str);
+	struct proc_dir_entry *ret = proc_creat(parent, "prio", &proc_task_info_prio_fops);
+	if (IS_ERR(ret))
 		return PTR_ERR(ret);
+	return 0;
+}
+
+static int create_task_proc(TCB *TCB_ptr)
+{
+	struct proc_dir_entry *TCB_entry;
+	int ret;
+	TCB_entry = proc_mkdir(task_info_proc_root, TCB_ptr->name);
+	if (IS_ERR(TCB_entry)) {
+		pr_shell("proc_mkdir fail\n");
+		return PTR_ERR(TCB_entry);
 	}
-	TCB_ptr->proc_entry = ret;
+	set_proc_entry_private(TCB_entry, TCB_ptr);
+	ret = create_task_info(TCB_ptr, TCB_entry);
+	if (ret < 0) {
+		pr_shell("create_task_info fail\n");
+		remove_proc_entry(TCB_entry);
+		return ret;
+	}
+	pr_shell("create_task_proc success\n");
 	return 0;
 }
 
@@ -74,6 +97,7 @@ int _must_check _task_init(
     void *para,
     TASK_STATE state)
 {
+	int ret;
 	ASSERT(prio < PRIO_MAX, ASSERT_INPUT);
 	ASSERT((NULL != name) && (NULL != TCB_ptr) && (NULL != function), ASSERT_INPUT);
 	stack_size &= (~0x03);/* according to CPU : 32bit?64bit*/
@@ -98,6 +122,11 @@ int _must_check _task_init(
 	TCB_ptr->timeslice_rest_time = timeslice_hope_time;
 	TCB_ptr->dynamic_module_ptr = NULL;
 	_register_in_TCB_list(TCB_ptr);
+	ret = create_task_proc(TCB_ptr);
+	if (unlikely(ret < 0)) {
+		ka_free(TCB_ptr->stack_end);
+		return ret;
+	}
 	return 0;
 }
 
@@ -135,21 +164,13 @@ TCB *_must_check _task_creat(
 
 int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 {
-	int ret = 0;
 	ASSERT(prio < PRIO_MAX, ASSERT_INPUT);
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	/*1 step: unresgister proc entry and register new one */
-	remove_proc_entry(TCB_ptr->proc_entry);
-	ret = create_task_proc(TCB_ptr, prio);
-	if (ret < 0) {
-		CPU_CRITICAL_EXIT();
-		return ret;
-	}
-	/*2 step: delete it from TCB_list*/
+	/*1 step: delete it from TCB_list*/
 	_delete_from_TCB_list(TCB_ptr);
-	/*3 step: according to the task_state,do some changes*/
+	/*2 step: according to the task_state,do some changes*/
 	switch (TCB_ptr->task_state)
 	{
 	case STATE_READY:
@@ -162,11 +183,11 @@ int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 	 */
 	default: break;/* do nothing*/
 	}
-	/*4 step: change the prio*/
+	/*3 step: change the prio*/
 	TCB_ptr->prio = prio;
-	/*5 step: register into TCB_list*/
+	/*4 step: register into TCB_list*/
 	_register_in_TCB_list(TCB_ptr);
-	/*6 step: according to the task_state,do some changes*/
+	/*5 step: according to the task_state,do some changes*/
 	/*this place should add different code according to the different task_state*/
 	switch (TCB_ptr->task_state)
 	{
