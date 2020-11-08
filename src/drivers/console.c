@@ -109,7 +109,6 @@ DEV_INIT_FUN(console_dev_register);
 static void __INIT parse_console(const char *str)
 {
 	unsigned int len;
-	pr_boot("in parse_console");
 	if (!str)
 		panic("no console set\n");
 	const char *ptr = str;

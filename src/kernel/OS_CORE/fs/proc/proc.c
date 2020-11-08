@@ -16,13 +16,6 @@ static struct proc_dir_entry proc_root = {
 	.name = "proc",
 };
 
-static struct proc_dir_entry proc_thread_root = {
-	.mode = PROC_DIR,
-	.fops = &default_file_operations,
-	.parent = NULL,
-	.name = "thread_info"
-};
-
 static void proc_dir_entry_init(int mode,
                                 struct proc_dir_entry *proc_dir_entry_ptr,
                                 struct file_operations *fops,
@@ -41,11 +34,11 @@ static void proc_dir_entry_init(int mode,
 	proc_dir_entry_ptr->name[ka_strlen(name)] = '\0';
 }
 
-int proc_mkdir(struct proc_dir_entry *parent, const char *name)
+struct proc_dir_entry *proc_mkdir(struct proc_dir_entry *parent, const char *name)
 {
 	struct proc_dir_entry *proc_dir_entry_ptr = ka_malloc(sizeof(struct proc_dir_entry) + ka_strlen(name) + 1);
 	if (NULL == proc_dir_entry_ptr)
-		return -ERROR_NO_MEM;
+		return ERR_PTR(-ERROR_NO_MEM);
 	proc_dir_entry_init(PROC_DIR, proc_dir_entry_ptr,
 	                    &default_file_operations,
 	                    parent, name);
@@ -56,17 +49,17 @@ int proc_mkdir(struct proc_dir_entry *parent, const char *name)
 		dentry_ptr = ___add_folder(proc_root.proc_dentry, name, &default_file_operations);
 	if (IS_ERR(dentry_ptr)) {
 		ka_free(proc_dir_entry_ptr);
-		return PTR_ERR(dentry_ptr);
+		return (void *)dentry_ptr;
 	}
 	proc_dir_entry_ptr->proc_dentry = dentry_ptr;
-	return 0;
+	return proc_dir_entry_ptr;
 }
 
-int proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops)
+struct proc_dir_entry *proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops)
 {
 	struct proc_dir_entry *proc_file_entry_ptr = ka_malloc(sizeof(struct proc_dir_entry) + ka_strlen(name) + 1);
 	if (NULL == proc_file_entry_ptr)
-		return -ERROR_NO_MEM;
+		return ERR_PTR(-ERROR_NO_MEM);
 	proc_dir_entry_init(PROC_FILE, proc_file_entry_ptr,
 	                    fops, parent, name);
 	struct dentry *dentry_ptr;
@@ -76,10 +69,10 @@ int proc_creat(struct proc_dir_entry *parent, const char *name, struct file_oper
 		dentry_ptr = ___add_file(proc_root.proc_dentry, name, fops);
 	if (IS_ERR(dentry_ptr)) {
 		ka_free(proc_file_entry_ptr);
-		return PTR_ERR(dentry_ptr);
+		return (void *)dentry_ptr;
 	}
 	proc_file_entry_ptr->proc_dentry = dentry_ptr;
-	return 0;
+	return proc_file_entry_ptr;
 }
 
 void remove_proc_entry(struct proc_dir_entry *entry)
@@ -103,8 +96,6 @@ void __INIT proc_init(void)
 		ASSERT(1, "should never go here\n");
 	}
 	proc_root.proc_dentry = dentry_ptr;
-	if (proc_mkdir(&proc_root, "thread_info"))
-		panic("proc init error\n");
 	for_each_bsp_device(i, bsp_device_ptr) {
 		if (DEV_MEM == bsp_device_ptr->head.type)
 			proc_meminfo_register(bsp_device_ptr);

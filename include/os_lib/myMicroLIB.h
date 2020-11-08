@@ -13,7 +13,9 @@
 
 
 void __init_my_micro_lib(void);
-int __attribute__((format(printf, 1, 2))) ka_printf(const char *str, ...);
+int __attribute__((format(printf, 3, 4))) _printf(char *dest_buffer,
+        void (*copy)(char **dest, char c, int level),
+        const char *str, ...);
 unsigned int ka_strlen(const char *s);
 void ka_memcpy(void *dest, const void *src, int n);
 void ka_puts(const char *string, int level);
@@ -24,6 +26,16 @@ void ka_strcpy(char *strDest, const char *strSrc);
 int ka_atoi(const char *char_ptr);
 double ka_atof(const char *char_ptr);
 int ka_strcmp(const char * str1, const char * str2);
+char *kstrdup(const char *str);
+char *kstrndup(const char *str, unsigned int len);
+void ka_printf_copy(char **dest, char c, int level);
+void sprintf_copy(char **dest, char c, int level);
+
+#define ka_sprintf(string, format, ... ) \
+	_printf(string, sprintf_copy, format, ##__VA_ARGS__)
+
+#define ka_printf(format, ...) \
+	_printf(NULL, ka_printf_copy, format, ##__VA_ARGS__)
 
 /* flag of malloc */
 #define FLAG_MALLOC_NORMAL  	0X00

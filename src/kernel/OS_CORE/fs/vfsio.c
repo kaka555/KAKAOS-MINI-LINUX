@@ -11,8 +11,7 @@ user should use the function in this file to operate the file
 
 int __open(struct dentry *dentry_ptr, enum FILE_FLAG flag, const struct file **file_store_ptr)
 {
-	if (get_dentry_flag(dentry_ptr) & FLAG_DENTRY_FOLDER)
-	{
+	if (get_dentry_flag(dentry_ptr) & FLAG_DENTRY_FOLDER) {
 		KA_WARN(DEBUG_TYPE_VFS, "'%s' is not a file\n", dentry_ptr->name);
 		return -ERROR_LOGIC;
 	}
@@ -21,36 +20,26 @@ int __open(struct dentry *dentry_ptr, enum FILE_FLAG flag, const struct file **f
 	{
 	case FILE_FLAG_READONLY:
 		if (!(dentry_ptr->d_inode->flag & FLAG_INODE_READ))
-		{
 			return -ERROR_SYS;
-		}
 		file_ptr = _file_alloc_and_init_READONLY(dentry_ptr);
 		if (NULL == file_ptr)
-		{
 			return -ERROR_NO_MEM;
-		}
 		break;
+		
 	case FILE_FLAG_WRITEONLY:
 		if (!(dentry_ptr->d_inode->flag & FLAG_INODE_WRITE))
-		{
 			return -ERROR_SYS;
-		}
 		file_ptr = _file_alloc_and_init_WRITEONLY(dentry_ptr);
 		if (NULL == file_ptr)
-		{
 			return -ERROR_NO_MEM;
-		}
 		break;
+		
 	case FILE_FLAG_READ_WRITE:
 		if (!(dentry_ptr->d_inode->flag & (FLAG_INODE_WRITE | FLAG_INODE_READ)))
-		{
 			return -ERROR_SYS;
-		}
 		file_ptr = _file_alloc_and_init_RDWR(dentry_ptr);
 		if (NULL == file_ptr)
-		{
 			return -ERROR_NO_MEM;
-		}
 		break;
 	default:
 		KA_WARN(DEBUG_TYPE_VFS, "function open flag error\n");
@@ -58,8 +47,7 @@ int __open(struct dentry *dentry_ptr, enum FILE_FLAG flag, const struct file **f
 		return -ERROR_LOGIC;
 	}
 	ASSERT(NULL != file_ptr, ASSERT_PARA_AFFIRM);
-	if (dentry_ptr->d_inode->inode_ops->get_size(file_ptr))
-	{
+	if (dentry_ptr->d_inode->inode_ops->get_size(file_ptr)) {
 		KA_WARN(DEBUG_TYPE_VFS, "function open get_size error\n");
 		return -ERROR_DISK;
 	}
@@ -68,13 +56,10 @@ int __open(struct dentry *dentry_ptr, enum FILE_FLAG flag, const struct file **f
 	CPU_CRITICAL_ENTER();
 	_dget(file_ptr->f_den);
 	CPU_CRITICAL_EXIT();
-	if (file_ptr->f_op->open)
-	{
+	if (file_ptr->f_op->open) {
 		int error = file_ptr->f_op->open(file_ptr);
 		if (error < 0)
-		{
 			return error;
-		}
 	}
 	*file_store_ptr = file_ptr;
 	return 0;
@@ -85,17 +70,14 @@ int _open(const char *path, enum FILE_FLAG flag, const struct file **file_store_
 	ASSERT(NULL != path, ASSERT_INPUT);
 	struct dentry *dentry_ptr = _find_dentry(path);
 	if (NULL == dentry_ptr)
-	{
 		return -ERROR_LOGIC;
-	}
 	return __open(dentry_ptr, flag, file_store_ptr);
 }
 
 /* open a file */
 int ka_open(const char *path, enum FILE_FLAG flag, const struct file **file_store_ptr)
 {
-	if ((NULL == path) || (NULL == file_store_ptr))
-	{
+	if ((NULL == path) || (NULL == file_store_ptr)) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(open, path);
 		OS_ERROR_PARA_MESSAGE_DISPLAY(open, file_store_ptr);
 		return NULL;

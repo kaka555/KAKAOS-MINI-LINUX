@@ -20,9 +20,8 @@ void ka_putchar(char ch, int level)
 		dmesg_buffer[head] = ch;
 		head = (head + 1) % DMESG_BUFFER_SIZE;
 	}
-	if (level < current_level) {
+	if (level < current_level)
 		console_putchar(ch);
-	}
 }
 
 static int dmesg_level_open(struct file *file_ptr)
@@ -38,9 +37,8 @@ static struct file_operations proc_dmesg_level_fops = {
 void __INIT dmesg_init(void)
 {
 	ASSERT(!(DMESG_BUFFER_SIZE & (PAGE_SIZE_BYTE - 1)), "DMESG_SIZE uncorrect\n");
-	if (proc_creat(NULL, "dmesg_level", &proc_dmesg_level_fops)) {
+	if (IS_ERR(proc_creat(NULL, "dmesg_level", &proc_dmesg_level_fops))) {
 		panic("proc dmesg_level register fail\n");
-		ASSERT(1, ASSERT_BAD_EXE_LOCATION);
 	}
 }
 INIT_FUN(dmesg_init, 3);

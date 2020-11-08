@@ -50,7 +50,7 @@ extern volatile int g_interrupt_count;
 /****end of attribution macro ****/
 
 struct dynamic_module; 
-typedef struct task_control_block_struct{
+typedef struct task_struct{
 	STACK_TYPE *stack; 						/*the stack top of the task*/
 	unsigned int stack_size;				/*bytes*/
 	STACK_TYPE *stack_end; 					/*the stack tail of the task*/
@@ -66,6 +66,7 @@ typedef struct task_control_block_struct{
 	UINT32 attribution;							/*each bit of this element present an attribution*/
 	struct dynamic_module *dynamic_module_ptr;	/* the related dynamic module*/
 	UINT64 delay_reach_time; 					/* use when task is delayed*/
+	struct proc_dir_entry *proc_entry;
 }TCB;
 
 /*To creat a task, use one of the two following function */

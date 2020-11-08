@@ -126,15 +126,6 @@ int sys_suspend(TASK_STATE state)
 	       (STATE_WAIT_MESSAGE_QUEUE_FOREVER == state) 	||
 	       (STATE_PUT_MESSAGE_QUEUE_FOREVER == state)	||
 	       (STATE_WAIT_MUTEX_FOREVER == state), ASSERT_INPUT);
-	if (!((STATE_SUSPEND_NORMAL == state) 				||
-	        (STATE_WAIT_MCB_FOREVER == state) 			||
-	        (STATE_WAIT_MESSAGE_QUEUE_FOREVER == state) 	||
-	        (STATE_PUT_MESSAGE_QUEUE_FOREVER == state)	||
-	        (STATE_WAIT_MUTEX_FOREVER == state)))
-	{
-		OS_ERROR_PARA_MESSAGE_DISPLAY(sys_delay, state);
-		return -ERROR_USELESS_INPUT;
-	}
 	return _sys_suspend(state);
 }
 EXPORT_SYMBOL(sys_suspend);
@@ -153,18 +144,12 @@ static _must_check int _task_creat_ready(
 	CPU_CRITICAL_ENTER();
 	TCB *TCB_ptr = _task_creat(stack_size, prio, timeslice_hope_time, name, function, para, STATE_READY);
 	if (NULL == TCB_ptr)
-	{
 		return -ERROR_SYS;
-	}
 	if (NULL != ptr)
-	{
 		*ptr = TCB_ptr;
-	}
 	ret = _insert_ready_TCB(TCB_ptr);
 	if (0 != ret)
-	{
 		return ret;
-	}
 	schedule();
 	CPU_CRITICAL_EXIT();
 	return 0;
@@ -193,17 +178,11 @@ int _must_check task_creat_ready(
     TCB **ptr)
 {
 	if (g_interrupt_count > 0)
-	{
 		return -ERROR_FUN_USE_IN_INTER;
-	}
 	if (prio >= PRIO_MAX)
-	{
 		return -ERROR_LOGIC;
-	}
 	if ((NULL == name) || (NULL == function))
-	{
 		return -ERROR_NULL_INPUT_PTR;
-	}
 	return _task_creat_ready(
 	           stack_size,
 	           prio,
@@ -227,14 +206,12 @@ int _must_check _task_init_ready(
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
 	int ret;
-	if (0 != _task_init(TCB_ptr, stack_size, prio, timeslice_hope_time, name, function, para, STATE_READY))
-	{
+	if (0 != _task_init(TCB_ptr, stack_size, prio, timeslice_hope_time, name, function, para, STATE_READY)) {
 		CPU_CRITICAL_EXIT();
 		return -ERROR_SYS;
 	}
 	ret = _insert_ready_TCB(TCB_ptr);
-	if (0 != ret)
-	{
+	if (0 != ret) {
 		CPU_CRITICAL_EXIT();
 		return ret;
 	}
@@ -266,17 +243,11 @@ int _must_check task_init_ready(
     void *para)
 {
 	if (g_interrupt_count > 0)
-	{
 		return -ERROR_FUN_USE_IN_INTER;
-	}
 	if (prio >= PRIO_MAX)
-	{
 		return -ERROR_LOGIC;
-	}
 	if ((NULL == TCB_ptr) || (NULL == name) || (NULL == function))
-	{
 		return -ERROR_NULL_INPUT_PTR;
-	}
 	return _task_init_ready(
 	           TCB_ptr,
 	           stack_size,
@@ -325,16 +296,14 @@ int _exec(
 	TCB *this_TCB_ptr = (TCB *)OSTCBCurPtr;
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	if (g_interrupt_count > 0)
-	{
+	if (g_interrupt_count > 0) {
 		CPU_CRITICAL_EXIT();
 		return -ERROR_FUN_USE_IN_INTER;
 	}
 	/* change the responding attribute */
 	/* 1.prepare stack */
 	STACK_TYPE *stack_addr = ka_malloc(this_TCB_ptr->stack_size);
-	if (NULL == stack_addr)
-	{
+	if (NULL == stack_addr) {
 		KA_WARN(DEBUG_EXEC, "alloc new stack fail\n");
 		return -ERROR_NO_MEM;
 	}
@@ -346,9 +315,7 @@ int _exec(
 	                      this_TCB_ptr->stack_size / 4 - 1;
 	/* 2.change name */
 	if (name)
-	{
 		this_TCB_ptr->name = (char *)name;
-	}
 	/* 3.set register */
 	extern void delete_myself(void);
 	set_register((void **)&this_TCB_ptr->stack, function, delete_myself, para);
@@ -379,8 +346,6 @@ int exec(
 )
 {
 	if (NULL == function)
-	{
 		return -ERROR_NULL_INPUT_PTR;
-	}
 	return _exec(name, function, para);
 }

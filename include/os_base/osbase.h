@@ -6,6 +6,8 @@
 #define __section(S) __attribute__ ((__section__(S)))
 
 #define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+#define likely(x)	__builtin_expect(!!(x), 1)
+#define unlikely(x)	__builtin_expect(!!(x), 0)
 
 typedef int bool;
 
@@ -23,7 +25,7 @@ static inline long PTR_ERR(const void *ptr)
 
 static inline bool IS_ERR(const void *ptr)
 {
-	return IS_ERR_VALUE((long)ptr);
+	return unlikely(IS_ERR_VALUE((long)ptr));
 }
 
 static inline char i2c(int num)
@@ -35,9 +37,5 @@ static inline int c2i(char c)
 {
 	return (c + (1 - '1'));
 }
-
-
-#define likely(x)	__builtin_expect(!!(x), 1)
-#define unlikely(x)	__builtin_expect(!!(x), 0)
 
 #endif

@@ -718,12 +718,12 @@ void shell(void *para)
 	(void)para;
 	int result;
 	shell_pre();
-	pr_shell("%s\n", "/*************************");
-	pr_shell("%s\n", "*");
-	pr_shell("%s\n", "*   kaka_os_mini_linux  shell");
-	pr_shell("%s\n", "*");
-	pr_shell("%s\n", "*************************/");
-	pr_shell("%s", "kaka_os>>");
+	pr_prompt("%s\n", "/*************************");
+	pr_prompt("%s\n", "*");
+	pr_prompt("%s\n", "*   kaka_os_mini_linux  shell");
+	pr_prompt("%s\n", "*");
+	pr_prompt("%s\n", "*************************/");
+	pr_prompt("%s", "kaka_os>>");
 	while (1)
 	{
 #if CONFIG_ASSERT_DEBUG
@@ -746,7 +746,7 @@ void shell(void *para)
 			using_shell_buffer_ptr->index_reserve = result;
 		}
 		clear_input_buffer();
-		pr_shell("%s", "kaka_os>>");
+		pr_prompt("%s", "kaka_os>>");
 	}
 
 }

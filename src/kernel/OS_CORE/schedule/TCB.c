@@ -11,6 +11,8 @@
 #include <os_schedule.h>
 #include <module.h>
 #include <export.h>
+#include <proc.h>
+#include <printf_debug.h>
 
 /**
  * the function in this file are used to manage TCB
@@ -20,6 +22,8 @@ volatile TCB *OSTCBCurPtr;
 volatile TCB *OSTCBHighRdyPtr;
 volatile int g_interrupt_count = 0;
 
+static struct proc_dir_entry *task_info_proc_root;
+
 /**
  * @Author      kaka
  * @DateTime    2019-04-21
@@ -28,6 +32,36 @@ volatile int g_interrupt_count = 0;
 void delete_myself(void)
 {
 	task_delete((TCB *)OSTCBCurPtr);
+}
+
+int task_info_open(struct file *file_ptr)
+{
+}
+
+int task_info_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
+{
+
+}
+
+static struct file_operations proc_task_info_fops = {
+	.open = task_info_open,
+	.read = task_info_read,
+};
+
+static int create_task_proc(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
+{
+	char *prio_str = ka_malloc(3);
+	struct proc_dir_entry * ret;
+	if (NULL == prio_str)
+		return -ERROR_NO_MEM;
+	ka_sprintf(prio_str,"%u",prio);
+	ret = proc_creat(NULL, prio_str, &proc_task_info_fops);
+	if (IS_ERR(ret)) {
+		ka_free(prio_str);
+		return PTR_ERR(ret);
+	}
+	TCB_ptr->proc_entry = ret;
+	return 0;
 }
 
 int _must_check _task_init(
@@ -45,9 +79,7 @@ int _must_check _task_init(
 	stack_size &= (~0x03);/* according to CPU : 32bit?64bit*/
 	TCB_ptr->stack_end = (STACK_TYPE *)ka_malloc(stack_size);
 	if (NULL == TCB_ptr->stack_end)
-	{
 		return -ERROR_NO_MEM;
-	}
 	TCB_ptr->stack_size = stack_size;
 	TCB_ptr->stack = (STACK_TYPE *)TCB_ptr->stack_end + stack_size / 4 - 1;
 	ASSERT((char *)(TCB_ptr->stack) == (char *)(TCB_ptr->stack_end) + stack_size - 4, ASSERT_PARA_AFFIRM);
@@ -82,9 +114,7 @@ TCB *_must_check _task_creat(
 	ASSERT((NULL != name) && (NULL != function), ASSERT_INPUT);
 	TCB *TCB_ptr = ka_malloc(sizeof(TCB));
 	if (NULL == TCB_ptr)
-	{
 		return NULL;
-	}
 	if (0 !=
 	        _task_init(	TCB_ptr,
 	                    stack_size,
@@ -105,13 +135,21 @@ TCB *_must_check _task_creat(
 
 int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 {
+	int ret = 0;
 	ASSERT(prio < PRIO_MAX, ASSERT_INPUT);
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	/*1 step: delete it from TCB_list*/
+	/*1 step: unresgister proc entry and register new one */
+	remove_proc_entry(TCB_ptr->proc_entry);
+	ret = create_task_proc(TCB_ptr, prio);
+	if (ret < 0) {
+		CPU_CRITICAL_EXIT();
+		return ret;
+	}
+	/*2 step: delete it from TCB_list*/
 	_delete_from_TCB_list(TCB_ptr);
-	/*2 step: according to the task_state,do some changes*/
+	/*3 step: according to the task_state,do some changes*/
 	switch (TCB_ptr->task_state)
 	{
 	case STATE_READY:
@@ -124,11 +162,11 @@ int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 	 */
 	default: break;/* do nothing*/
 	}
-	/*3 step: change the prio*/
+	/*4 step: change the prio*/
 	TCB_ptr->prio = prio;
-	/*4 step: register into TCB_list*/
+	/*5 step: register into TCB_list*/
 	_register_in_TCB_list(TCB_ptr);
-	/*5 step: according to the task_state,do some changes*/
+	/*6 step: according to the task_state,do some changes*/
 	/*this place should add different code according to the different task_state*/
 	switch (TCB_ptr->task_state)
 	{
@@ -157,13 +195,11 @@ int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
  */
 int task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 {
-	if (prio >= PRIO_MAX)
-	{
+	if (unlikely(prio >= PRIO_MAX)) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(task_change_prio, prio);
 		return -ERROR_USELESS_INPUT;
 	}
-	if (NULL == TCB_ptr)
-	{
+	if (unlikely(NULL == TCB_ptr)) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(task_change_prio, TCB_ptr);
 		return -ERROR_NULL_INPUT_PTR;
 	}
@@ -205,19 +241,14 @@ int _task_delete(TCB *TCB_ptr)
 		ASSERT(0, ASSERT_BAD_EXE_LOCATION);
 		break;
 	}
-	if (is_module(TCB_ptr))
-	{
+	if (is_module(TCB_ptr)) {
 		ASSERT(TCB_ptr->dynamic_module_ptr, ASSERT_PARA_AFFIRM);
 		set_module_state(TCB_ptr->dynamic_module_ptr, MODULE_STATE_LOADED);
 	}
 	if (TCB_ptr == OSTCBCurPtr)
-	{
 		OSTCBCurPtr = NULL;
-	}
 	if (TCB_IS_CREATED(TCB_ptr))
-	{
 		ka_free(TCB_ptr);
-	}
 	CPU_CRITICAL_EXIT();
 	schedule();
 	return 0;
@@ -240,3 +271,11 @@ int task_delete(TCB *TCB_ptr)
 	return _task_delete(TCB_ptr);
 }
 EXPORT_SYMBOL(task_delete);
+
+static void __INIT TCB_proc_init(void)
+{
+	task_info_proc_root = proc_mkdir(NULL, "task_info");
+	if (IS_ERR(task_info_proc_root))
+		panic("task_info proc init fail\n");
+}
+INIT_FUN(TCB_proc_init, 3);

@@ -56,7 +56,6 @@ void __init_svc(void);
 CPU_SR      CPU_SR_Save      (void);
 void        CPU_SR_Restore   (CPU_SR cpu_sr);
 void early_bsp_init(void);
-void bsp_init(void);
 void bsp_putchar(char ch);
 
 #endif

@@ -31,13 +31,13 @@ static struct file_operations proc_meminfo_fops = {
 int proc_meminfo_register(const struct bsp_device *mem_dev)
 {
 	static int mem_num = 0;
-	int ret;
+	struct proc_dir_entry *ret;
 	MARK();
 	if (mem_num >= 10)
 		return -ERROR_SYS;
 	mem_name[3] = i2c(mem_num);
 	ret = proc_creat(NULL, mem_name, &proc_meminfo_fops);
-	if (ret)
+	if (IS_ERR(ret))
 		panic("proc %s create fail\n", mem_name);
 	mem_dev_array[mem_num] = mem_dev;
 	++mem_num;

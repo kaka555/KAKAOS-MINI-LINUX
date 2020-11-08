@@ -18,13 +18,11 @@ struct proc_dir_entry
 	struct file_operations *fops;
 	struct proc_dir_entry *parent;
 	struct dentry *proc_dentry;
-//	struct list_head sibling_entry;
-//	struct list_head subdir;
 	char *name;
 };
 
-int proc_mkdir(struct proc_dir_entry *parent, const char *name);
-int proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops);
+struct proc_dir_entry *proc_mkdir(struct proc_dir_entry *parent, const char *name);
+struct proc_dir_entry * proc_creat(struct proc_dir_entry *parent, const char *name, struct file_operations *fops);
 void remove_proc_entry(struct proc_dir_entry *entry);
 int proc_meminfo_register(const struct bsp_device *mem_dev);
 

@@ -71,7 +71,6 @@ static void __INIT os_init(void)
 {
 	early_bsp_init(); //early device init
 	early_console_init();
-	bsp_putchar('c');
 	pr_debug("finish early_bsp_init()\n");
 	cmdline_parse();
 	pr_debug("finish cmdline_parse()\n");
@@ -126,13 +125,9 @@ void __INIT _os_start(void)
 
 	/*==============register initialization task===================*/
 	if (0 != task_init_ready(&TCB_count_init, 600, PRIO_MAX - 2, 5, "count_init", count_init, NULL))
-	{
 		panic("create task count_init error\n");
-	}
 	if (0 != task_init_ready(&TCB_idle, 256, PRIO_MAX - 1, HZ, "idle", idle, NULL))
-	{
 		panic("create task idle error\n");
-	}
 	/*==================================================================*/
 
 	OSTCBCurPtr = _get_highest_prio_ready_TCB();

@@ -233,12 +233,9 @@ void __buddy_init(const struct dev_mem_para *dev_mem_para_ptr)
 	unsigned int buffer;
 	UINT32 size_sum = 0;
 	struct buddy *buddy_ptr;
-	if (TYPE_NORMAL == dev_mem_para_ptr->type)
-	{
+	if (TYPE_NORMAL == dev_mem_para_ptr->type) {
 		buddy_ptr = (struct buddy *)(dev_mem_para_ptr->start);
-	}
-	else
-	{
+	} else {
 		ASSERT(TYPE_SYS == dev_mem_para_ptr->type, ASSERT_PARA_AFFIRM);
 		buddy_ptr = (struct buddy *)(&_ebss + 1);
 	}
@@ -247,25 +244,27 @@ void __buddy_init(const struct dev_mem_para *dev_mem_para_ptr)
 	buddy_ptr->flag = (Flag_Type *)((char *)buddy_ptr + sizeof(struct buddy));
 	size = dev_mem_para_ptr->size / (PAGE_SIZE_KB * 8 * sizeof(Flag_Type));
 	if (dev_mem_para_ptr->size % (PAGE_SIZE_KB * 8 * sizeof(Flag_Type)))
-	{
 		++size;
-	}
 	buddy_ptr->info.flag_array_num = size;
 	size_sum += size * sizeof(Flag_Type);
 	buddy_ptr->link_body = (struct order_link *)((char *)buddy_ptr->flag + size * sizeof(Flag_Type));
+
 	/*allocate room for link_body[current_used_buddy_ptr->info.page_num]*/
 	size = dev_mem_para_ptr->size / PAGE_SIZE_KB;
 	buddy_ptr->info.page_num = size;
 	size_sum += size * sizeof(struct order_link);
 	buddy_ptr->order_link_flag = (Page_Num_Type *)((char *)buddy_ptr->link_body + size * sizeof(struct order_link));
+
 	/*allocate room for order_link_flag[current_used_buddy_ptr->info.page_num]	*/
 	size_sum += size * sizeof(Page_Num_Type);
 	buddy_ptr->order_array = (Page_Num_Type *)((char *)buddy_ptr->order_link_flag + size * sizeof(Page_Num_Type));
+
 	/*allocate room for order_array[current_used_buddy_ptr->info.max_level]	*/
 	size = get_max_level(buddy_ptr->info.page_num);
 	buddy_ptr->info.max_level = size;
 	size_sum += size * sizeof(Page_Num_Type);
 	buddy_ptr->level_flag_base = (UINT16 *)((char *)buddy_ptr->order_array + size * sizeof(Page_Num_Type));
+
 	/*allocate room for level_flag_base[buddy_ptr->info.level_flag_base_size]*/
 	size = buddy_ptr->info.max_level;
 
@@ -276,6 +275,7 @@ void __buddy_init(const struct dev_mem_para *dev_mem_para_ptr)
 	buddy_ptr->buddy_space_start_ptr = (Buddy_Space_Type *)(dev_mem_para_ptr->start);
 	buddy_ptr->next = NULL;
 	buddy_ptr->info.prio = dev_mem_para_ptr->prio;
+
 	/*init the data*/
 	for (i = 0; i < buddy_ptr->info.flag_array_num; ++i)
 		buddy_ptr->flag[i] = 0;
@@ -301,17 +301,11 @@ void __buddy_init(const struct dev_mem_para *dev_mem_para_ptr)
 	size = (unsigned int)buddy_ptr - (unsigned int)dev_mem_para_ptr->start + buddy_ptr->buddy_struct_size + sizeof(struct buddy);
 	ka_printf("space used by os is %d\n", size);
 	if (size % PAGE_SIZE_BYTE)
-	{
 		size = size / PAGE_SIZE_BYTE + 1;
-	}
 	else
-	{
 		size /= PAGE_SIZE_BYTE;
-	}
-	for (i = 0; i < current_used_buddy_ptr->info.max_level; ++i)
-	{
-		if (((0x01u) << i) >= size)
-		{
+	for (i = 0; i < current_used_buddy_ptr->info.max_level; ++i) {
+		if (((0x01u) << i) >= size) {
 			ka_printf("allocate level %d\n", i + 1);
 			_alloc_page(i + 1);
 			current_used_buddy_ptr->current_page_num -= 0x01 << i;
