@@ -73,17 +73,16 @@ static int create_task_proc(TCB *TCB_ptr)
 	int ret;
 	TCB_entry = proc_mkdir(task_info_proc_root, TCB_ptr->name);
 	if (IS_ERR(TCB_entry)) {
-		pr_shell("proc_mkdir fail\n");
+		pr_info("proc_mkdir fail\n");
 		return PTR_ERR(TCB_entry);
 	}
 	set_proc_entry_private(TCB_entry, TCB_ptr);
 	ret = create_task_info(TCB_ptr, TCB_entry);
 	if (ret < 0) {
-		pr_shell("create_task_info fail\n");
+		pr_info("create_task_info fail\n");
 		remove_proc_entry(TCB_entry);
 		return ret;
 	}
-	pr_shell("create_task_proc success\n");
 	return 0;
 }
 
@@ -105,8 +104,8 @@ int _must_check _task_init(
 	if (NULL == TCB_ptr->stack_end)
 		return -ERROR_NO_MEM;
 	TCB_ptr->stack_size = stack_size;
-	TCB_ptr->stack = (STACK_TYPE *)TCB_ptr->stack_end + stack_size / 4 - 1;
-	ASSERT((char *)(TCB_ptr->stack) == (char *)(TCB_ptr->stack_end) + stack_size - 4, ASSERT_PARA_AFFIRM);
+	TCB_ptr->stack = (STACK_TYPE *)TCB_ptr->stack_end + stack_size / 4;
+	ASSERT((char *)(TCB_ptr->stack) == (char *)(TCB_ptr->stack_end) + stack_size, ASSERT_PARA_AFFIRM);
 	ka_memset(TCB_ptr->stack_end, 0, stack_size);
 	set_register((void **)&TCB_ptr->stack, function, delete_myself, para);
 	TCB_ptr->prio = prio;

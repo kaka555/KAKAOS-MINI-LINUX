@@ -22,9 +22,6 @@
 #define PUBLIC
 #define PRIVATE
 
-#define KA_TRUE		1
-#define KA_FALSE	0
-
 #define OS_ERROR_MESSAGE_DISPLAY(text) 			ka_printf(#text)
 #define OS_ERROR_PARA_MESSAGE_DISPLAY(fun,para)	ka_printf("error fun name : " #fun "\n""error para : " #para "\n")
 

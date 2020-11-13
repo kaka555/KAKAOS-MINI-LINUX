@@ -10,6 +10,8 @@
 #define unlikely(x)	__builtin_expect(!!(x), 0)
 
 typedef int bool;
+#define true		1
+#define false		0
 
 #define IS_ERR_VALUE(x) ((x) <= (long)0)
 

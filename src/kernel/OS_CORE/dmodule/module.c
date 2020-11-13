@@ -653,10 +653,10 @@ int dlmodule_load_relocated_object(struct dynamic_module* module, void *module_p
  */
 int dlmodule_load_shared_object(struct dynamic_module* module, void *module_ptr)
 {
-	int linked   = KA_FALSE;
+	int linked   = false;
 	UINT32 index, module_size = 0;
 	Elf32_Addr vstart_addr, vend_addr;
-	int has_vstart = KA_FALSE;
+	int has_vstart = false;
 
 	ASSERT(module_ptr != NULL, ASSERT_INPUT);
 
@@ -679,7 +679,7 @@ int dlmodule_load_shared_object(struct dynamic_module* module, void *module_ptr)
 		{
 			vstart_addr = phdr[index].p_vaddr;
 			vend_addr = phdr[index].p_vaddr + phdr[index].p_memsz;
-			has_vstart = KA_TRUE;
+			has_vstart = true;
 			if (vend_addr < vstart_addr)
 			{
 				ka_printf("invalid elf: segment %d: p_vaddr: %d, p_memsz: %d\n",
@@ -752,7 +752,7 @@ int dlmodule_load_shared_object(struct dynamic_module* module, void *module_ptr)
 		Elf32_Sym *symtab;
 		Elf32_Rel *rel;
 		UINT8 *strtab;
-		static int unsolved = KA_FALSE;
+		static int unsolved = false;
 
 		if (!IS_REL(shdr[index]))
 			continue;
@@ -794,7 +794,7 @@ int dlmodule_load_shared_object(struct dynamic_module* module, void *module_ptr)
 				if ((0 == addr) && (!(addr = get_mod_export_function_addr((const char *)(strtab + sym->st_name)))))
 				{
 					ka_printf("Module: can't find %s in kernel symbol table", strtab + sym->st_name);
-					unsolved = KA_TRUE;
+					unsolved = true;
 					break;
 				}
 				else

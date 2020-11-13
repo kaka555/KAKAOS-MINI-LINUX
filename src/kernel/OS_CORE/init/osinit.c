@@ -152,25 +152,17 @@ void start_kernel(void)
 void task_start(void)
 {
 	if (0 != task_init_ready(&TCB_init, 508, 0, 3, "init", thread_init, NULL))
-	{
 		panic("create task init error\n");
-	}
 #if CONFIG_SHELL_EN
 	if (0 != task_init_ready(&TCB_shell, 1000, 0, 3, "shell", shell, NULL))
-	{
 		panic("create task shell error\n");
-	}
 #endif
 #if CONFIG_TIMER_EN
 	if (0 != task_init_ready(&TCB_timer_task, 256, 0, 3, "timer_task", timer_task, NULL))
-	{
 		panic("create task timer_task error\n");
-	}
 #endif
 	if (0 != task_creat_ready(1000, 4, 5, "three", three, NULL, NULL))
-	{
 		panic("create task three error\n");
-	}
 }
 
 /**
