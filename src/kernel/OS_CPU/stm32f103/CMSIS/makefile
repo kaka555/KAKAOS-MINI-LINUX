@@ -1,4 +1,4 @@
-SRCS = ${shell ls *.c}
+SRCS = system_stm32f10x.c
 
 ASM_SRCS = 
 

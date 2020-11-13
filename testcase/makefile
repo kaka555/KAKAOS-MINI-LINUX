@@ -1,8 +1,8 @@
 SRCS = testcase1.c
 
-ifeq ($(PROJECT),stm32f103)
-SRCS += bsp_led.c
-endif
+#ifeq ($(PROJECT),stm32f103)
+#SRCS += bsp_led.c
+#endif
 
 ASM_SRCS = 
 

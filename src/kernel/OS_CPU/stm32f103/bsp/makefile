@@ -1,10 +1,10 @@
-SRCS = ${shell ls *.c}
+SRCS = bsp_usart.c stm32_bsp.c
 
 ASM_SRCS = 
 
 SUB_DIR_y =
 
-SUB_DIR_$(CONFIG_VFS) += flash
+SUB_DIR_$(CONFIG_VFS) +=
 
 $(SUB_TGT): $(SRCS:.c=.o) $(ASM_SRCS:.s=.o) $(SUB_DIR_y)
 	$(LD) $(SRCS:.c=.o) $(ASM_SRCS:.s=.o) $(SUB_DIR_y:=/$(SUB_TGT)) $(LDFLAG)  -r -o $@
