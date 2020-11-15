@@ -2,6 +2,9 @@
 #include <myMicroLIB.h>
 #include <linker.h>
 #include <dmesg.h>
+#include <TCB.h>
+
+extern volatile TCB *OSTCBCurPtr;
 
 /* check the disassembly instruction is 'BL' or 'BLX' */
 static bool disassembly_ins_is_bl_blx(UINT32 addr) {
@@ -27,6 +30,7 @@ size_t backtrace_call_stack(UINT32 stack_start_addr, UINT32 stack_size, UINT32 s
 {
 	unsigned int pc;
 	unsigned int depth = 0;
+	pr_shell("Call Trace:\n");
 #define KA_CALL_STACK_MAX_DEPTH 15
 	/* copy called function address */
 	for (; sp < stack_start_addr + stack_size; sp += sizeof(size_t)) {
@@ -45,10 +49,26 @@ size_t backtrace_call_stack(UINT32 stack_start_addr, UINT32 stack_size, UINT32 s
 //			if ((depth == 2) && regs_saved_lr_is_valid) {
 //				continue;
 //			}
-			pr_emerg("pc is %u\n", pc);
+			pr_emerg("pc is %x\n", pc);
 			depth++;
 		}
 	}
 
 	return depth;
+}
+
+void dump_stack(void)
+{
+	UINT32 current_sp;
+	volatile TCB *current = OSTCBCurPtr;
+extern volatile int in_fault;
+	if (in_fault)
+		asm( "MRS %[result], PSP;"
+			: [result]"=r"(current_sp)
+		);
+	else
+		asm( "mov %[result], sp;"
+			: [result]"=r"(current_sp)
+		);
+	backtrace_call_stack((UINT32)current->stack_end, current->stack_size, current_sp);
 }

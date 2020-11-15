@@ -2,6 +2,7 @@
 #define _PRINTF_DEBUG_DEBUG
 #include <ka_configuration.h>
 #include <dmesg.h>
+#include <os_cpu.h>
 
 #if CONFIG_PRINTF_DEBUG
 #define PRINTF(format, ...) ka_printf (format, ##__VA_ARGS__)
@@ -36,6 +37,7 @@
 			pr_emerg("file_name: %s\tline_num: %u\tfunction_name: %s\n", \
 				__FILE__,__LINE__,__FUNCTION__); \
 			pr_emerg("panic::" format,##__VA_ARGS__);\
+			dump_stack(); \
 			while(1);\
 		}while(0)
 

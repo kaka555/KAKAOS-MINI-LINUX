@@ -206,42 +206,31 @@ static void recover_shell_buffer(void)
 void _put_in_shell_buffer(char c)  /* deal with input layer*/
 {
 	if (c == 0x0a)
-	{
 		return ;
-	}
 	/* check the input char */
 	if ( ! (	IS_LOWER(c) || IS_UPPER(c) || (0x0d == c) ||
 	            (0x03 == c) || (0x08 == c) || (' ' == c)  ||
 	            IS_NUM(c) 	|| IS_DOT(c)   || ('-' == c)  ||
 	            ('+' == c)	|| ('=' == c)  || ('/' == c)  ||
-	            (0x09 == c) || ('>' == c)))
-	{
+	            (0x09 == c) || ('>' == c)  || ('_' == c))) {
 		pr_shell("\nerror input\n");
 		pr_shell("%s", using_shell_buffer_ptr->buffer);
 		return ;
 	}
-	if (0x08 == c) /* backspace key*/
-	{
-		if (using_shell_buffer_ptr->index > 0)
-		{
+	if (0x08 == c) { /* backspace key*/
+		if (using_shell_buffer_ptr->index > 0) {
 			--(using_shell_buffer_ptr->index);
 			pr_shell("\b \b");
-		}
-		else
-		{
+		} else {
 			ASSERT(0 == using_shell_buffer_ptr->index, ASSERT_PARA_AFFIRM);
 		}
 		return ;
-	}
-	else if (0x09 == c) /* tab */
-	{
+	} else if (0x09 == c) { /* tab */
 		using_shell_buffer_ptr->buffer[(using_shell_buffer_ptr->index)] = 0x0d;
 		deal_with_tab();
 		recover_shell_buffer();
 		return ;
-	}
-	else if (0x0d == c) /* enter */
-	{
+	} else if (0x0d == c) {/* enter */
 		pr_shell("\n");
 		using_shell_buffer_ptr->buffer[(using_shell_buffer_ptr->index)++] = 0x0d;
 		using_shell_buffer_ptr->buffer[using_shell_buffer_ptr->index] = '\0';
@@ -249,14 +238,11 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 		_v(&MCB_for_shell);
 		return ;
 	}
-	if (using_shell_buffer_ptr->index < using_shell_buffer_ptr->buffer_size)
-	{
+	if (using_shell_buffer_ptr->index < using_shell_buffer_ptr->buffer_size) {
 		ka_putchar(c, KERN_SHELL_LEVEL); /* echo */
 		using_shell_buffer_ptr->buffer[(using_shell_buffer_ptr->index)++] = c;
 		using_shell_buffer_ptr->buffer[using_shell_buffer_ptr->index] = '\0';
-	}
-	else
-	{
+	} else {
 		pr_shell("\ntoo long,invalid input,clear buffer...\n");
 		using_shell_buffer_ptr->index = 0;
 		return ;
@@ -266,16 +252,13 @@ void _put_in_shell_buffer(char c)  /* deal with input layer*/
 static int _shell_exec(const char *command)
 {
 	unsigned int len = ka_strlen(command);
-	if (len + 1 > using_shell_buffer_ptr->buffer_size)
-	{
+	if (len + 1 > using_shell_buffer_ptr->buffer_size) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(_shell_exec, command);
 		return -ERROR_USELESS_INPUT;
 	}
 	unsigned int i;
 	for (i = 0; i < len; ++i)
-	{
 		_put_in_shell_buffer(command[i]);
-	}
 	_put_in_shell_buffer(0x0d);
 	return 0;
 }
@@ -289,8 +272,7 @@ static int _shell_exec(const char *command)
  */
 int shell_exec(const char *command)
 {
-	if (NULL == command)
-	{
+	if (NULL == command) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(shell_exec, command);
 		return -ERROR_NULL_INPUT_PTR;
 	}
@@ -301,22 +283,17 @@ static void redo(int argc, char const *argv[])
 {
 	(void)argc;
 	(void)argv;
-	if (using_shell_buffer_ptr->buffer_reserve)
-	{
+	if (using_shell_buffer_ptr->buffer_reserve){
 		unsigned int i;
 		ASSERT(using_shell_buffer_ptr->index_reserve < BUFFER_SIZE, ASSERT_PARA_AFFIRM);
 		pr_shell("redo command: ");
 		for (i = 0; i < using_shell_buffer_ptr->index_reserve; ++i)
-		{
 			ka_puts((const char *)(using_shell_buffer_ptr->argv_reserve)[i], KERN_SHELL_LEVEL);
-		}
 		ka_putchar('\n', KERN_SHELL_LEVEL);
 		_match_and_execute_command(using_shell_buffer_ptr->index_reserve,
 		                           (const char **)(using_shell_buffer_ptr->argv_reserve),
 		                           _get_command_processer(ka_strlen((using_shell_buffer_ptr->argv_reserve)[0])));
-	}
-	else
-	{
+	} else {
 		pr_shell("no reserved buffer,command not saved\n");
 	}
 }

@@ -36,6 +36,9 @@
 #include <os_time.h>
 #include <dmesg.h>
 #include <console.h>
+
+volatile int in_fault = 0;
+
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
   */
@@ -71,6 +74,7 @@ void hard_fault_handler_c(unsigned int * hardfault_args)
   unsigned int stacked_lr;
   unsigned int stacked_pc;
   unsigned int stacked_psr;
+  in_fault = 1;
 
   stacked_r0 = ((unsigned long) hardfault_args[0]);
   stacked_r1 = ((unsigned long) hardfault_args[1]);
@@ -95,6 +99,7 @@ void hard_fault_handler_c(unsigned int * hardfault_args)
   pr_emerg ("HFSR = 0x%lx\r\n", (*((volatile unsigned long *)(0xE000ED2C))));
   pr_emerg ("DFSR = 0x%lx\r\n", (*((volatile unsigned long *)(0xE000ED30))));
   pr_emerg ("AFSR = 0x%lx\r\n", (*((volatile unsigned long *)(0xE000ED3C))));
+  dump_stack();
   /*
   #if CONFIG_SHELL_EN
     shell_stack_check(1,NULL);

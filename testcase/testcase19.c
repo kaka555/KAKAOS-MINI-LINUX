@@ -19,6 +19,9 @@ void fun3(void)
 	   );
 	size_t deap = backtrace_call_stack((UINT32)current->stack_end, current->stack_size, current_sp);
 	pr_shell("deap is %u\n", deap);
+	pr_shell("now going to trigger panic\n");
+	*(int *)0 = 0;
+	while(1) ;
 }
 
 void fun2(void)

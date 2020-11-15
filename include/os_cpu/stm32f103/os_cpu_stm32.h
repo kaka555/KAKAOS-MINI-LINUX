@@ -59,5 +59,7 @@ void        CPU_SR_Restore   (CPU_SR cpu_sr);
 void early_bsp_init(void);
 void bsp_putchar(char ch);
 size_t backtrace_call_stack(UINT32 stack_start_addr, UINT32 stack_size, UINT32 sp);
+void dump_stack(void);
+
 
 #endif
