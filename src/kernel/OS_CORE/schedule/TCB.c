@@ -73,7 +73,7 @@ static int task_dump_stack_read(struct file *file_ptr, void *buffer, unsigned in
 {
 	struct task_struct *task_struct_ptr = file_ptr->private_data;
 	backtrace_call_stack((UINT32)task_struct_ptr->stack_end, task_struct_ptr->stack_size,
-		task_struct_ptr->stack);
+		(UINT32)task_struct_ptr->stack);
 	return len;
 }
 

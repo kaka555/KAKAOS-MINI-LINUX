@@ -13,6 +13,7 @@
 #include <osinit.h>
 #include <module.h>
 #include <vfs.h>
+#include <console.h>
 
 /* this file realize most of the shell function */
 
@@ -66,11 +67,15 @@ void shell_clear(int argc, char const *argv[])
 {
 	(void)argc;
 	(void)argv;
-	unsigned int i;
-	for (i = 0; i < 40; ++i)
-	{
-		pr_shell("\n");
-	}
+
+	console_putchar('\x1b');
+	console_putchar('[');
+	console_putchar('2');
+	console_putchar('J');
+
+	console_putchar('\x1b');
+	console_putchar('[');
+	console_putchar('H');
 }
 #if CONFIG_SHELL_DEBUG_EN && CONFIG_SHELL_EN
 void shell_echo(int argc, char const *argv[])
