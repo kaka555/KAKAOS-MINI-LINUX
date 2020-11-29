@@ -3,8 +3,9 @@
 #include <linker.h>
 #include <dmesg.h>
 #include <TCB.h>
+#include <myassert.h>
 
-extern volatile TCB *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
 
 /* check the disassembly instruction is 'BL' or 'BLX' */
 static bool disassembly_ins_is_bl_blx(UINT32 addr) {
@@ -30,6 +31,7 @@ size_t backtrace_call_stack(UINT32 stack_start_addr, UINT32 stack_size, UINT32 s
 {
 	unsigned int pc;
 	unsigned int depth = 0;
+	ASSERT((sp < stack_start_addr + stack_size) && (stack_start_addr < sp), ASSERT_INPUT);
 	pr_shell("Call Trace:\n");
 #define KA_CALL_STACK_MAX_DEPTH 15
 	/* copy called function address */
@@ -60,7 +62,7 @@ size_t backtrace_call_stack(UINT32 stack_start_addr, UINT32 stack_size, UINT32 s
 void dump_stack(void)
 {
 	UINT32 current_sp;
-	volatile TCB *current = OSTCBCurPtr;
+	volatile struct task_struct *current = OSTCBCurPtr;
 extern volatile int in_fault;
 	if (in_fault)
 		asm( "MRS %[result], PSP;"

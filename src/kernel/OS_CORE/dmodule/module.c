@@ -154,7 +154,7 @@ void _restart_module(
 			{
 				prio = D_MODULE_DEFAULT_PRIO;
 			}
-			TCB *TCB_ptr;
+			struct task_struct *TCB_ptr;
 			int error = task_creat_ready(stack_size, prio, HZ / 10, name,
 			                             (functionptr)(dynamic_module_ptr->entry), NULL, &TCB_ptr);
 			if (!error)
@@ -992,7 +992,7 @@ int _dlmodule_exec(
 {
 	struct dynamic_module *module = NULL;
 	int error;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 
 	module = dlmodule_load();
 	if ((module) && (module->entry))

@@ -10,9 +10,9 @@ struct TCB_list {
 	unsigned char TCB_num;
 };
 
-TCB *find_TCB_with_name(const char *name);
-void _register_in_TCB_list(TCB *TCB_ptr);
-int _delete_from_TCB_list(TCB *TCB_ptr);
+struct task_struct *find_TCB_with_name(const char *name);
+void _register_in_TCB_list(struct task_struct *TCB_ptr);
+int _delete_from_TCB_list(struct task_struct *TCB_ptr);
 struct list_head *_get_from_TCB_list(unsigned int index);
 unsigned char _get_ready_num_from_TCB_list(unsigned int index);
 void _decrease_ready_num(unsigned int index);

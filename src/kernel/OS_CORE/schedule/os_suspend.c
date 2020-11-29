@@ -17,13 +17,13 @@ static void __INIT __init_suspend_list(void)
 }
 INIT_FUN(__init_suspend_list, 1);
 
-void _insert_into_suspend_list(TCB *const TCB_ptr)
+void _insert_into_suspend_list(struct task_struct *const TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	list_add_tail(&TCB_ptr->suspend_list, &suspend_list_head);
 }
 
-int _remove_from_suspend_list(TCB *TCB_ptr)
+int _remove_from_suspend_list(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	struct list_head *pos;

@@ -3,8 +3,8 @@
 #include <osinit.h>
 #include <os_delay.h>
 
-extern volatile TCB *OSTCBCurPtr;
-extern volatile TCB *OSTCBHighRdyPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBHighRdyPtr;
 
 #include <bsp_support.h>
 static int open(struct file *file_ptr)

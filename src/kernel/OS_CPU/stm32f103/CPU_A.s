@@ -31,8 +31,3 @@ CPU_SR_Save:
 CPU_SR_Restore:                                  
         MSR     PRIMASK, R0
         BX      LR
-
-
-
-
-

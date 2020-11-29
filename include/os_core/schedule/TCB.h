@@ -14,7 +14,7 @@ typedef  void                  (*functionptr)(void *para);
 
 #define SYS_ENTER_INTERRUPT()  do { CPU_IntDis();++g_interrupt_count;CPU_IntEn();} while (0)
 #define SYS_EXIT_INTERRUPT()   do { CPU_IntDis();--g_interrupt_count;CPU_IntEn();} while (0)
-#define task_change_prio_self(prio)	task_change_prio((TCB *)OSTCBCurPtr,(prio))
+#define task_change_prio_self(prio)	task_change_prio((struct task_struct *)OSTCBCurPtr,(prio))
 
 extern volatile int g_interrupt_count;
 
@@ -25,7 +25,7 @@ extern volatile int g_interrupt_count;
 /**** attribution macro ****/
 #define DEFAULT_ATTRIBUTION 	0
 /**** bit 0 ****/
-/* identify the struct TCB is created or init */
+/* identify the struct struct task_struct is created or init */
 #define TCB_ATTRIBUTION_INIT 				(0X00<<0)
 #define TCB_ATTRIBUTION_CREATE 				(0X01<<0)
 #define TCB_IS_CREATED(TCB_ptr) 			((TCB_ptr)->attribution & TCB_ATTRIBUTION_CREATE)
@@ -69,7 +69,7 @@ typedef struct task_struct {
 } TCB;
 
 /*To creat a task, use one of the two following function */
-TCB * _must_check _task_creat(
+struct task_struct * _must_check _task_creat(
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -79,7 +79,7 @@ TCB * _must_check _task_creat(
     TASK_STATE state);/*this function use malloc to creat room for TCB*/
 
 int _must_check _task_init(
-    TCB *TCB_ptr,
+    struct task_struct *TCB_ptr,
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -88,12 +88,12 @@ int _must_check _task_init(
     void *para,
     TASK_STATE state);
 
-int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio);
-int task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio);
-int _task_delete(TCB *TCB_ptr);
-int task_delete(TCB *TCB_ptr);
+int _task_change_prio(struct task_struct *TCB_ptr, TASK_PRIO_TYPE prio);
+int task_change_prio(struct task_struct *TCB_ptr, TASK_PRIO_TYPE prio);
+int _task_delete(struct task_struct *TCB_ptr);
+int task_delete(struct task_struct *TCB_ptr);
 
-static inline void set_tcb_module(TCB *TCB_ptr, struct dynamic_module *mod_ptr)
+static inline void set_tcb_module(struct task_struct *TCB_ptr, struct dynamic_module *mod_ptr)
 {
 	TCB_ptr->dynamic_module_ptr = mod_ptr;
 }

@@ -23,11 +23,11 @@ int _must_check task_creat_ready(
 	const char *name,
 	functionptr function,
 	void *para,
-	TCB **ptr
+	struct task_struct **ptr
 );
 
 int _must_check task_init_ready(
-	TCB *TCB_ptr,
+	struct task_struct *TCB_ptr,
 	unsigned int stack_size,
 	TASK_PRIO_TYPE prio,
 	unsigned int timeslice_hope_time,

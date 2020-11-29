@@ -3,14 +3,14 @@
 #include <osinit.h>
 #include <os_delay.h>
 
-extern volatile TCB *OSTCBCurPtr;
-extern volatile TCB *OSTCBHighRdyPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBHighRdyPtr;
 
 #include <myassert.h>
 void three(void *para)
 {
 
-	TCB *TCB_ptr4, *TCB_ptr5;
+	struct task_struct *TCB_ptr4, *TCB_ptr5;
 	if (0 != task_creat_ready(256, 5, 5, "five", five, NULL, &TCB_ptr5))
 	{
 		ka_printf("os_init_fail...stop booting...\n");

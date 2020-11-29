@@ -46,7 +46,7 @@ struct dynamic_module
     struct ka_module_symtab *export_symbols_array;
     unsigned int export_symbols_num;
     unsigned int ref;
-    TCB *thread_TCB_ptr;
+    struct task_struct *thread_TCB_ptr;
 };
 
 typedef struct dynamic_module d_module;

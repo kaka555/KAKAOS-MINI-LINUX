@@ -60,7 +60,7 @@ static void __INIT __init_ready_group(void)
 }
 INIT_FUN(__init_ready_group, 1);
 
-int _insert_ready_TCB(TCB *TCB_ptr)
+int _insert_ready_TCB(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	TCB_ptr->task_state = STATE_READY;
@@ -72,7 +72,7 @@ int _insert_ready_TCB(TCB *TCB_ptr)
 }
 
 /*if os delete a task,use _delete_from_TCB_list() first*/
-int _delete_TCB_from_ready(TCB *TCB_ptr)
+int _delete_TCB_from_ready(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	_decrease_ready_num(TCB_ptr->prio);
@@ -90,11 +90,11 @@ int _delete_TCB_from_ready(TCB *TCB_ptr)
 	return 0;
 }
 
-TCB *_get_highest_prio_ready_TCB(void)
+struct task_struct *_get_highest_prio_ready_TCB(void)
 {
 	int y;
 	struct list_head *pos, *head;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	/*according to the ready_group and ready_table,get the highest priority
 	**than, get the respoding head of the same-priority TCB_list*/
 	y = unmap[ready_group]; /* the lowest '1' bit */
@@ -102,7 +102,7 @@ TCB *_get_highest_prio_ready_TCB(void)
 	list_for_each(pos, head)
 	{
 		TCB_ptr = list_entry(pos, TCB, same_prio_list);
-		if (STATE_READY == TCB_ptr->task_state) /*take the first TCB whose state is ready*/
+		if (STATE_READY == TCB_ptr->task_state) /*take the first struct task_struct whose state is ready*/
 		{
 			return TCB_ptr;
 		}
@@ -118,7 +118,7 @@ void shell_check_os_ready(void)
 	unsigned int i, j;
 	unsigned int num = 0;
 	struct list_head *pos, *head;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	unsigned int ready_TCB_num;
 	unsigned int TCB_num;
 	/* check relation between ready_group and ready_table*/

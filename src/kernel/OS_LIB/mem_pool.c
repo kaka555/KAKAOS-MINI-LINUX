@@ -14,7 +14,7 @@
 #if CONFIG_MEM_POOL
 
 static mp *mp_head;
-extern TCB * OSTCBCurPtr;
+extern struct task_struct * OSTCBCurPtr;
 extern int get_set_bit_place(unsigned int num);
 
 static int compare(struct insert_sort_data *data1, struct insert_sort_data *data2)

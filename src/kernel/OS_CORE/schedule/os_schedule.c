@@ -12,8 +12,8 @@
 #include <export.h>
 #include <printf_debug.h>
 
-extern volatile TCB *OSTCBCurPtr;
-extern volatile TCB *OSTCBHighRdyPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBHighRdyPtr;
 extern volatile int g_interrupt_count;
 extern UINT64 g_time_tick_count;
 
@@ -56,8 +56,8 @@ int _sys_delay(unsigned int delay_ticks_num, TASK_STATE state)
 	}
 	OSTCBCurPtr->delay_reach_time = delay_ticks_num + g_time_tick_count;
 	OSTCBCurPtr->task_state = state;
-	_delete_TCB_from_ready((TCB *)OSTCBCurPtr);
-	_insert_into_delay_heap((TCB *)OSTCBCurPtr);
+	_delete_TCB_from_ready((struct task_struct *)OSTCBCurPtr);
+	_insert_into_delay_heap((struct task_struct *)OSTCBCurPtr);
 	schedule();
 	CPU_CRITICAL_EXIT();
 	return (unsigned int)(OSTCBCurPtr->delay_reach_time - _get_tick());
@@ -105,8 +105,8 @@ int _sys_suspend(TASK_STATE state)
 		return -ERROR_FUN_USE_IN_INTER;
 	}
 	OSTCBCurPtr->task_state = state;
-	_delete_TCB_from_ready((TCB *)OSTCBCurPtr);
-	_insert_into_suspend_list((TCB *)OSTCBCurPtr);
+	_delete_TCB_from_ready((struct task_struct *)OSTCBCurPtr);
+	_insert_into_suspend_list((struct task_struct *)OSTCBCurPtr);
 	schedule();
 	CPU_CRITICAL_EXIT();
 	return 0;
@@ -137,12 +137,12 @@ static _must_check int _task_creat_ready(
     const char *name,
     functionptr function,
     void *para,
-    TCB **ptr)
+    struct task_struct **ptr)
 {
 	int ret;
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
-	TCB *TCB_ptr = _task_creat(stack_size, prio, timeslice_hope_time, name, function, para, STATE_READY);
+	struct task_struct *TCB_ptr = _task_creat(stack_size, prio, timeslice_hope_time, name, function, para, STATE_READY);
 	if (NULL == TCB_ptr)
 		return -ERROR_SYS;
 	if (NULL != ptr)
@@ -175,7 +175,7 @@ int _must_check task_creat_ready(
     const char *name,
     functionptr function,
     void *para,
-    TCB **ptr)
+    struct task_struct **ptr)
 {
 	if (g_interrupt_count > 0)
 		return -ERROR_FUN_USE_IN_INTER;
@@ -195,7 +195,7 @@ int _must_check task_creat_ready(
 EXPORT_SYMBOL(task_creat_ready);
 
 int _must_check _task_init_ready(
-    TCB *TCB_ptr,
+    struct task_struct *TCB_ptr,
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -234,7 +234,7 @@ int _must_check _task_init_ready(
  * @return                          [description]
  */
 int _must_check task_init_ready(
-    TCB *TCB_ptr,
+    struct task_struct *TCB_ptr,
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -292,8 +292,8 @@ int _exec(
 )
 {
 	ASSERT(NULL != function, ASSERT_INPUT);
-	/* get the TCB of this task */
-	TCB *this_TCB_ptr = (TCB *)OSTCBCurPtr;
+	/* get the struct task_struct of this task */
+	struct task_struct *this_TCB_ptr = (struct task_struct *)OSTCBCurPtr;
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();
 	if (g_interrupt_count > 0) {
@@ -309,7 +309,7 @@ int _exec(
 	}
 	/* free the former stack */
 	ka_free(this_TCB_ptr->stack_end);
-	/* change TCB stack attrbution */
+	/* change struct task_struct stack attrbution */
 	this_TCB_ptr->stack_end = stack_addr;
 	this_TCB_ptr->stack = (STACK_TYPE *)this_TCB_ptr->stack_end +
 	                      this_TCB_ptr->stack_size / 4 - 1;

@@ -6,14 +6,14 @@
 #include <sys_init_fun.h>
 
 /*
-use array to mark TCB with different priority
+use array to mark struct task_struct with different priority
  */
 
 static struct TCB_list TCB_list[PRIO_MAX];
 
-TCB *find_TCB_with_name(const char *name)
+struct task_struct *find_TCB_with_name(const char *name)
 {
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	int i;
 	for (i = 0; i < PRIO_MAX; ++i) {
 		list_for_each_entry(TCB_ptr, &TCB_list[i].head, same_prio_list) {
@@ -38,7 +38,7 @@ static void __INIT __init_TCB_list(void)
 INIT_FUN(__init_TCB_list, 1);
 
 /*os must set the task_state before using this function*/
-void _register_in_TCB_list(TCB *TCB_ptr)
+void _register_in_TCB_list(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	list_add(&TCB_ptr->same_prio_list, &TCB_list[TCB_ptr->prio].head);
@@ -55,7 +55,7 @@ void _register_in_TCB_list(TCB *TCB_ptr)
  * @param       TCB_ptr    [description]
  * @return                 [description]
  */
-int _delete_from_TCB_list(TCB *TCB_ptr)
+int _delete_from_TCB_list(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	struct list_head *pos;
@@ -118,7 +118,7 @@ void shell_check_TCB_list(void)
 	unsigned int i;
 	unsigned int ready_num = 0, TCB_num = 0;
 	struct list_head *pos;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	for (i = 0; i < PRIO_MAX; ++i)
 	{
 		if (!list_empty(&TCB_list[i].head))
@@ -183,7 +183,7 @@ void shell_stack_check(int argc, char const *argv[])
 	(void)argv;
 	unsigned int i;
 	struct list_head *pos;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	for (i = 0; i < PRIO_MAX; ++i)
 	{
 		if (!list_empty(&TCB_list[i].head))
@@ -227,7 +227,7 @@ void shell_show_tasks_registers(int argc, char const *argv[])
 	(void)argc;
 	(void)argv;
 	unsigned int i;
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	for (i = 0; i < PRIO_MAX; ++i)
 	{
 		if (!list_empty(&TCB_list[i].head))

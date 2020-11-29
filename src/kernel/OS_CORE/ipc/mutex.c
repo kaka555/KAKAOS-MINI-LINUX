@@ -5,7 +5,7 @@
 #include <os_suspend.h>
 #include <export.h>
 
-extern volatile TCB * OSTCBCurPtr;
+extern volatile struct task_struct * OSTCBCurPtr;
 
 static int compare(struct insert_sort_data *data1, struct insert_sort_data *data2)
 {
@@ -53,13 +53,13 @@ int _mutex_lock(MUTEX *MUTEX_ptr)
 	if (MUTEX_UNLOCK == MUTEX_ptr->mutex_flag)
 	{
 		MUTEX_ptr->mutex_flag = MUTEX_LOCK;
-		MUTEX_ptr->owner_TCB_ptr = (TCB *)OSTCBCurPtr;
+		MUTEX_ptr->owner_TCB_ptr = (struct task_struct *)OSTCBCurPtr;
 		CPU_CRITICAL_EXIT();
 	}
 	else
 	{
 		ASSERT(MUTEX_LOCK == MUTEX_ptr->mutex_flag, ASSERT_PARA_AFFIRM);
-		if (MUTEX_ptr->owner_TCB_ptr == (TCB *)OSTCBCurPtr)
+		if (MUTEX_ptr->owner_TCB_ptr == (struct task_struct *)OSTCBCurPtr)
 		{
 			CPU_CRITICAL_EXIT();
 			return 0;
@@ -67,7 +67,7 @@ int _mutex_lock(MUTEX *MUTEX_ptr)
 		struct insert_sort_data data;
 		init_insert_sort_data(&data, (void *)OSTCBCurPtr);
 		insert_sort_insert_into(&data, &MUTEX_ptr->mutex_insert_sort_TCB_list);
-		TCB *TCB_ptr = (TCB *)(insert_sort_get_first_data_ptr(&MUTEX_ptr->mutex_insert_sort_TCB_list)->data_ptr);
+		struct task_struct *TCB_ptr = (struct task_struct *)(insert_sort_get_first_data_ptr(&MUTEX_ptr->mutex_insert_sort_TCB_list)->data_ptr);
 		if (MUTEX_ptr->owner_TCB_ptr->prio > TCB_ptr->prio)
 		{
 			if (RESERVED_PRIO == MUTEX_ptr->owner_TCB_ptr->reserve_prio)
@@ -121,7 +121,7 @@ int _mutex_try_lock(MUTEX *MUTEX_ptr)
 	if (MUTEX_UNLOCK == MUTEX_ptr->mutex_flag)
 	{
 		MUTEX_ptr->mutex_flag = MUTEX_LOCK;
-		MUTEX_ptr->owner_TCB_ptr = (TCB *)OSTCBCurPtr;
+		MUTEX_ptr->owner_TCB_ptr = (struct task_struct *)OSTCBCurPtr;
 		CPU_CRITICAL_EXIT();
 		return 0;
 	}
@@ -180,8 +180,8 @@ int _mutex_unlock(MUTEX *MUTEX_ptr)
 	}
 	else/* a task is waiting for the mutex*/
 	{
-		_remove_from_suspend_list((TCB *)(buffer_ptr->data_ptr));
-		MUTEX_ptr->owner_TCB_ptr = (TCB *)(buffer_ptr->data_ptr);
+		_remove_from_suspend_list((struct task_struct *)(buffer_ptr->data_ptr));
+		MUTEX_ptr->owner_TCB_ptr = (struct task_struct *)(buffer_ptr->data_ptr);
 		schedule();
 	}
 	CPU_CRITICAL_EXIT();
@@ -209,11 +209,11 @@ EXPORT_SYMBOL(mutex_unlock);
 int _mutex_del(MUTEX *MUTEX_ptr)
 {
 	ASSERT(NULL != MUTEX_ptr, ASSERT_INPUT);
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	struct insert_sort_data *insert_sort_data_ptr = insert_sort_delete_head(&MUTEX_ptr->mutex_insert_sort_TCB_list);
 	while (NULL != insert_sort_data_ptr)
 	{
-		TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+		TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 		ASSERT(STATE_WAIT_MUTEX_FOREVER == TCB_ptr->task_state, ASSERT_PARA_AFFIRM);
 		_remove_from_suspend_list(TCB_ptr);
 		set_bad_state(TCB_ptr);

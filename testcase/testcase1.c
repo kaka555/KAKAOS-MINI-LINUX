@@ -6,8 +6,8 @@ normal task; basic function
 #include <os_delay.h>
 
 
-extern volatile TCB *OSTCBCurPtr;
-extern volatile TCB *OSTCBHighRdyPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBHighRdyPtr;
 
 void three(void *para)
 {

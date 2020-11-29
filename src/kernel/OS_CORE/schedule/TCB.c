@@ -18,8 +18,8 @@
  * the function in this file are used to manage TCB
  */
 
-volatile TCB *OSTCBCurPtr;
-volatile TCB *OSTCBHighRdyPtr;
+volatile struct task_struct *OSTCBCurPtr;
+volatile struct task_struct *OSTCBHighRdyPtr;
 volatile int g_interrupt_count = 0;
 
 static struct proc_dir_entry *task_info_proc_root;
@@ -31,13 +31,13 @@ static struct proc_dir_entry *task_info_proc_root;
  */
 void delete_myself(void)
 {
-	task_delete((TCB *)OSTCBCurPtr);
+	task_delete((struct task_struct *)OSTCBCurPtr);
 }
 
-int task_info_open(struct file *file_ptr)
+static int save_task_struct(struct file *file_ptr)
 {
 	const char *name = file_ptr->f_den->d_parent->name;
-	TCB *TCB_ptr = find_TCB_with_name(name);
+	struct task_struct *TCB_ptr = find_TCB_with_name(name);
 	if (NULL == TCB_ptr)
 		return -ERROR_LOGIC;
 	file_ptr->private_data = TCB_ptr;
@@ -47,9 +47,14 @@ int task_info_open(struct file *file_ptr)
 	return 0;
 }
 
+static int task_info_open(struct file *file_ptr)
+{
+	return save_task_struct(file_ptr);
+}
+
 static int task_prio_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
 {
-	TCB *TCB_ptr = file_ptr->private_data;
+	struct task_struct *TCB_ptr = file_ptr->private_data;
 	pr_shell("prio: %u\n", TCB_ptr->prio);
 	return len;
 }
@@ -59,15 +64,38 @@ static struct file_operations proc_task_info_prio_fops = {
 	.read = task_prio_read,
 };
 
-static int create_task_info(TCB *TCB_ptr, struct proc_dir_entry *parent)
+static int task_dump_stack_open(struct file *file_ptr)
+{
+	return save_task_struct(file_ptr);
+}
+
+static int task_dump_stack_read(struct file *file_ptr, void *buffer, unsigned int len, unsigned int offset)
+{
+	struct task_struct *task_struct_ptr = file_ptr->private_data;
+	backtrace_call_stack((UINT32)task_struct_ptr->stack_end, task_struct_ptr->stack_size,
+		task_struct_ptr->stack);
+	return len;
+}
+
+static struct file_operations proc_task_dump_stack_fops = {
+	.open = task_dump_stack_open,
+	.read = task_dump_stack_read,
+};
+
+static int create_task_info(struct task_struct *TCB_ptr, struct proc_dir_entry *parent)
 {
 	struct proc_dir_entry *ret = proc_creat(parent, "prio", &proc_task_info_prio_fops);
 	if (IS_ERR(ret))
 		return PTR_ERR(ret);
+	struct proc_dir_entry *dump_stack_entry = proc_creat(parent, "dump_stack", &proc_task_dump_stack_fops);
+	if (IS_ERR(dump_stack_entry)) {
+		remove_proc_entry(ret);
+		return PTR_ERR(dump_stack_entry);
+	}
 	return 0;
 }
 
-static int create_task_proc(TCB *TCB_ptr)
+static int create_task_proc(struct task_struct *TCB_ptr)
 {
 	struct proc_dir_entry *TCB_entry;
 	int ret;
@@ -87,7 +115,7 @@ static int create_task_proc(TCB *TCB_ptr)
 }
 
 int _must_check _task_init(
-    TCB *TCB_ptr,
+    struct task_struct *TCB_ptr,
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -129,7 +157,7 @@ int _must_check _task_init(
 	return 0;
 }
 
-TCB *_must_check _task_creat(
+struct task_struct *_must_check _task_creat(
     unsigned int stack_size,
     TASK_PRIO_TYPE prio,
     unsigned int timeslice_hope_time,
@@ -140,7 +168,7 @@ TCB *_must_check _task_creat(
 {
 	ASSERT((prio < PRIO_MAX), ASSERT_INPUT);
 	ASSERT((NULL != name) && (NULL != function), ASSERT_INPUT);
-	TCB *TCB_ptr = ka_malloc(sizeof(TCB));
+	struct task_struct *TCB_ptr = ka_malloc(sizeof(TCB));
 	if (NULL == TCB_ptr)
 		return NULL;
 	if (0 !=
@@ -161,7 +189,7 @@ TCB *_must_check _task_creat(
 	return TCB_ptr;
 }
 
-int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
+int _task_change_prio(struct task_struct *TCB_ptr, TASK_PRIO_TYPE prio)
 {
 	ASSERT(prio < PRIO_MAX, ASSERT_INPUT);
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
@@ -213,7 +241,7 @@ int _task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
  * @param       prio
  * @return      error code
  */
-int task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
+int task_change_prio(struct task_struct *TCB_ptr, TASK_PRIO_TYPE prio)
 {
 	if (unlikely(prio >= PRIO_MAX)) {
 		OS_ERROR_PARA_MESSAGE_DISPLAY(task_change_prio, prio);
@@ -227,7 +255,7 @@ int task_change_prio(TCB *TCB_ptr, TASK_PRIO_TYPE prio)
 }
 EXPORT_SYMBOL(task_change_prio);
 
-int _task_delete(TCB *TCB_ptr)
+int _task_delete(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	CPU_SR_ALLOC();
@@ -281,7 +309,7 @@ int _task_delete(TCB *TCB_ptr)
  * @param       TCB_ptr    [description]
  * @return                 [description]
  */
-int task_delete(TCB *TCB_ptr)
+int task_delete(struct task_struct *TCB_ptr)
 {
 	if (NULL == TCB_ptr)
 	{

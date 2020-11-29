@@ -9,8 +9,8 @@
 #include <printf_debug.h>
 
 /**
- * the delay TCB use heap to manage, the value of comparation is the reach time
- * the top TCB will be the soonest reach TCB
+ * the delay struct task_struct use heap to manage, the value of comparation is the reach time
+ * the top struct task_struct will be the soonest reach TCB
 */
 
 #define TIME_FIRST_SMALLER_THAN_SECOND(first,second) ((INT64)(first)-(INT64)(second) < 0)
@@ -21,7 +21,7 @@ static struct little_heap delay_heap;
 /*this function is used by delay_heap*/
 static int _cmp(Vector *Vector_ptr, unsigned int index1, unsigned int index2)
 {
-	const TCB *a, *b;
+	const struct task_struct *a, *b;
 	a = Vector_get_index_data(Vector_ptr, index1);
 	b = Vector_get_index_data(Vector_ptr, index2);
 	if (TIME_FIRST_SMALLER_THAN_SECOND(a->delay_reach_time, b->delay_reach_time))
@@ -40,7 +40,7 @@ static int _cmp(Vector *Vector_ptr, unsigned int index1, unsigned int index2)
 
 static inline void index_change_record(Vector *Vector_ptr, int index)
 {
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	TCB_ptr = Vector_get_index_data(Vector_ptr, index);
 	TCB_ptr->delay_heap_position = index;
 }
@@ -58,16 +58,16 @@ INIT_FUN(__init_delay_heap, 1);
 /*before inserting action,os should set the delay_reach_time
 this function do not change the task_state of the TCB,os shoule
 change it before using this function*/
-int _insert_into_delay_heap(TCB *TCB_ptr)
+int _insert_into_delay_heap(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
 	return heap_push(&delay_heap, TCB_ptr);
 }
 
-int _remove_from_delay_heap(TCB *TCB_ptr)
+int _remove_from_delay_heap(struct task_struct *TCB_ptr)
 {
 	ASSERT(NULL != TCB_ptr, ASSERT_INPUT);
-	TCB *TCB_ptr_buffer;
+	struct task_struct *TCB_ptr_buffer;
 	int i;
 	int ret;
 	int len = heap_get_cur_len(&delay_heap);
@@ -90,7 +90,7 @@ int _remove_from_delay_heap(TCB *TCB_ptr)
 
 TCB* _delay_heap_get_top_TCB(void)
 {
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	if (0 != heap_get_top_safe(&delay_heap, (void *)&TCB_ptr))
 	{
 		return NULL;
@@ -100,7 +100,7 @@ TCB* _delay_heap_get_top_TCB(void)
 
 TCB* _delay_heap_remove_top_TCB(void)
 {
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	if (0 != heap_remove_top(&delay_heap, &TCB_ptr))
 	{
 		return NULL;
@@ -111,7 +111,7 @@ TCB* _delay_heap_remove_top_TCB(void)
 #if CONFIG_SHELL_EN
 void shell_delay_heap_check(void)
 {
-	TCB *TCB_ptr1, *TCB_ptr2;
+	struct task_struct *TCB_ptr1, *TCB_ptr2;
 	unsigned int delay_TCB_num;
 	unsigned int i;
 	delay_TCB_num = heap_get_cur_len(&delay_heap) - 1;

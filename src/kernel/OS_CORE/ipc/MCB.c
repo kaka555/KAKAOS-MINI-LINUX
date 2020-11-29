@@ -10,7 +10,7 @@
 #include <export.h>
 
 
-extern TCB * OSTCBCurPtr;
+extern struct task_struct * OSTCBCurPtr;
 
 static int compare(struct insert_sort_data *data1, struct insert_sort_data *data2)
 {
@@ -79,13 +79,13 @@ EXPORT_SYMBOL(init_MCB);
 int _delete_MCB(MCB *MCB_ptr)
 {
 	ASSERT(NULL != MCB_ptr, ASSERT_INPUT);
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	CPU_SR_ALLOC();
 	CPU_CRITICAL_ENTER();/*enter critical*/
 	struct insert_sort_data *insert_sort_data_ptr = insert_sort_delete_head(&MCB_ptr->MCB_insert_sort_list);
 	while (NULL != insert_sort_data_ptr)
 	{
-		TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+		TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 		if (STATE_WAIT_MCB_FOREVER == TCB_ptr->task_state)
 		{
 			_remove_from_suspend_list(TCB_ptr);
@@ -214,7 +214,7 @@ int _v(MCB *MCB_ptr)
 	}
 	if (MCB_ptr->resource_num <= 0)
 	{
-		TCB *TCB_ptr = (TCB *)(insert_sort_delete_head(&MCB_ptr->MCB_insert_sort_list))->data_ptr;
+		struct task_struct *TCB_ptr = (struct task_struct *)(insert_sort_delete_head(&MCB_ptr->MCB_insert_sort_list))->data_ptr;
 
 		if (STATE_WAIT_MCB_FOREVER == TCB_ptr->task_state)
 			_remove_from_suspend_list(TCB_ptr);

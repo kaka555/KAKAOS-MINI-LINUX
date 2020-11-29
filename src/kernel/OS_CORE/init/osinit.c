@@ -21,14 +21,14 @@
 #include <console.h>
 
 #if CONFIG_SHELL_EN
-static TCB TCB_shell;
+static struct task_struct TCB_shell;
 #endif
-static TCB TCB_init;
-static TCB TCB_idle;
-static TCB TCB_count_init;
+static struct task_struct TCB_init;
+static struct task_struct TCB_idle;
+static struct task_struct TCB_count_init;
 
 #if CONFIG_TIMER_EN
-TCB TCB_timer_task;
+struct task_struct TCB_timer_task;
 #endif
 
 UINT64 idle_num = 0;
@@ -37,8 +37,8 @@ unsigned int  count_max_num = 0;/*used for counting cpu used rate*/
 extern int g_schedule_lock;
 extern UINT64 g_time_tick_count;
 extern volatile int g_interrupt_count;
-extern TCB *OSTCBCurPtr;
-extern TCB *OSTCBHighRdyPtr;
+extern struct task_struct *OSTCBCurPtr;
+extern struct task_struct *OSTCBHighRdyPtr;
 extern struct singly_list_head *const cache_chain_head_ptr;
 
 #if CONFIG_TIMER_EN

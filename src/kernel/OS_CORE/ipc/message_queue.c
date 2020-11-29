@@ -7,7 +7,7 @@
 #include <os_suspend.h>
 #include <export.h>
 
-extern TCB * OSTCBCurPtr;
+extern struct task_struct * OSTCBCurPtr;
 
 static int compare(struct insert_sort_data *data1, struct insert_sort_data *data2)
 {
@@ -90,10 +90,10 @@ int _msg_send(MQB *MQB_ptr, struct message *message_ptr, MSG_FLAG flag, unsigned
 		if (MQB_ptr->wait_num)
 		{
 			struct insert_sort_data *insert_sort_data_ptr;
-			TCB *TCB_ptr;
+			struct task_struct *TCB_ptr;
 			insert_sort_data_ptr = insert_sort_delete_head(&MQB_ptr->message_array_insert_sort_wait_TCB_list);
 			ASSERT(NULL != insert_sort_data_ptr, ASSERT_PARA_AFFIRM);
-			TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+			TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 			if (STATE_WAIT_MESSAGE_QUEUE_FOREVER == TCB_ptr->task_state)
 			{
 				_remove_from_suspend_list(TCB_ptr);
@@ -196,10 +196,10 @@ int _msg_receive(MQB *MQB_ptr, struct message **message_ptr, MSG_FLAG flag, unsi
 		if (MQB_ptr->put_num)
 		{
 			struct insert_sort_data *insert_sort_data_ptr;
-			TCB *TCB_ptr;
+			struct task_struct *TCB_ptr;
 			insert_sort_data_ptr = insert_sort_delete_head(&MQB_ptr->message_array_insert_sort_put_TCB_list);
 			ASSERT(NULL != insert_sort_data_ptr, ASSERT_PARA_AFFIRM);
-			TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+			TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 			if (STATE_PUT_MESSAGE_QUEUE_FOREVER == TCB_ptr->task_state)
 			{
 				_remove_from_suspend_list(TCB_ptr);
@@ -293,11 +293,11 @@ EXPORT_SYMBOL(msg_receive);
 int _msg_del(MQB *MQB_ptr)
 {
 	ASSERT(NULL != MQB_ptr, ASSERT_INPUT);
-	TCB *TCB_ptr;
+	struct task_struct *TCB_ptr;
 	struct insert_sort_data *insert_sort_data_ptr = insert_sort_delete_head(&MQB_ptr->message_array_insert_sort_wait_TCB_list);
 	while (NULL != insert_sort_data_ptr)
 	{
-		TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+		TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 		if (STATE_WAIT_MESSAGE_QUEUE_FOREVER == TCB_ptr->task_state)
 		{
 			_remove_from_suspend_list(TCB_ptr);
@@ -313,7 +313,7 @@ int _msg_del(MQB *MQB_ptr)
 	insert_sort_data_ptr = insert_sort_delete_head(&MQB_ptr->message_array_insert_sort_put_TCB_list);
 	while (NULL != insert_sort_data_ptr)
 	{
-		TCB_ptr = (TCB *)(insert_sort_data_ptr->data_ptr);
+		TCB_ptr = (struct task_struct *)(insert_sort_data_ptr->data_ptr);
 		if (STATE_PUT_MESSAGE_QUEUE_FOREVER == TCB_ptr->task_state)
 		{
 			_remove_from_suspend_list(TCB_ptr);

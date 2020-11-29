@@ -19,11 +19,11 @@ extern UINT64 idle_num;
 extern UINT64 count_max_num;
 #endif
 
-extern volatile TCB *OSTCBCurPtr;
-extern volatile TCB *OSTCBHighRdyPtr;
+extern volatile struct task_struct *OSTCBCurPtr;
+extern volatile struct task_struct *OSTCBHighRdyPtr;
 
 #if CONFIG_TIMER_EN
-extern TCB TCB_timer_task;
+extern struct task_struct TCB_timer_task;
 #endif
 
 
@@ -85,7 +85,7 @@ unsigned int get_cpu_use_rate(void)
  */
 static void delay_task_check(void)
 {
-	TCB *TCB_ptr = _delay_heap_get_top_TCB();
+	struct task_struct *TCB_ptr = _delay_heap_get_top_TCB();
 	while (NULL != TCB_ptr)
 	{
 		if (TCB_ptr->delay_reach_time == g_time_tick_count)
@@ -131,7 +131,7 @@ void timer_task_check(void)
  */
 static void run_task_handler(void)
 {
-	TCB *TCB_ptr = (TCB *)OSTCBCurPtr;
+	struct task_struct *TCB_ptr = (struct task_struct *)OSTCBCurPtr;
 	if (--(TCB_ptr->timeslice_rest_time))
 	{
 		return ;

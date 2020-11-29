@@ -6,7 +6,7 @@ typedef struct task_struct TCB;
 
 typedef struct mutex_block{
 	unsigned int mutex_flag; /* should be 0 or 1*/
-	TCB *owner_TCB_ptr;
+	struct task_struct *owner_TCB_ptr;
 	struct insert_sort_entity mutex_insert_sort_TCB_list;
 }MUTEX;
 
