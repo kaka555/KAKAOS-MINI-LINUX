@@ -4,12 +4,15 @@
 #include <myassert.h>
 #include <myMicroLIB.h>
 #include <sys_init_fun.h>
+#include <os_schedule.h>
+#include <os_time.h>
+#include <shell_fun.h>
+#include <osinit.h>
 
 /*
 use array to mark struct task_struct with different priority
  */
-
-static struct TCB_list TCB_list[PRIO_MAX];
+struct TCB_list TCB_list[PRIO_MAX];
 
 struct task_struct *find_TCB_with_name(const char *name)
 {
@@ -261,6 +264,49 @@ void shell_show_tasks_registers(int argc, char const *argv[])
 			}
 		}
 	}
+}
+
+static void insert_top_array(struct top *array, int current_num, struct task_struct *task)
+{
+	get_task(task);
+	array[current_num].task = task;
+	array[current_num].base_time = task->run_time;
+}
+
+static void show_top(struct top *array, int current_num, int last_time)
+{
+	int i;
+	int gap = _get_tick() - last_time;
+	int task_gap_array[TOP_ARRAY_MAX];
+	ASSERT(current_num <= TOP_ARRAY_MAX, ASSERT_INPUT);
+	for (i = 0; i < current_num; ++i) {
+		task_gap_array[i] = (array[i].task->run_time - array[i].base_time) * 100 / gap;
+		array[i].base_time = array[i].task->run_time;
+	}
+	do_shell_clear();
+	pr_shell("task name\t%%USE\n");
+	for (i = 0; i < current_num; ++i)
+		pr_shell("%s\t%d\n", array[i].task->name, task_gap_array[i]);
+}
+
+void shell_top(int argc, char const *argv[])
+{
+	int i = 5;
+	int j;
+	struct top top_array[TOP_ARRAY_MAX];
+	int array_num = 0;
+	struct task_struct *task_struct_ptr;
+	for_each_task(j, task_struct_ptr) {
+		insert_top_array(top_array, array_num, task_struct_ptr);
+		++array_num;
+	}
+	while (i--) {
+		UINT64 last_time = _get_tick();
+		sleep(HZ);
+		show_top(top_array, array_num, last_time);
+	}
+	for (i = 0; i < array_num; ++i)
+		put_task(top_array[i].task);
 }
 
 #endif

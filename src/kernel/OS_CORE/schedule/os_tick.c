@@ -56,6 +56,7 @@ static inline void tick_time_handler(void)
 	time_flag++;
 #endif
 	++g_time_tick_count;
+	++OSTCBCurPtr->run_time;
 #if CONFIG_TIME_EN
 	if (TICK_PER_SEC == time_flag)
 	{
@@ -166,8 +167,8 @@ void  OS_CPU_SysTickHandler(void)
 	timer_task_check();
 #endif
 	run_task_handler();
-	if (need_rescheduled() && !sys_schedule_islock()) /* g_schedule_lock lock here */
-	{	/* which means we can use schedule() */
+	if (need_rescheduled() && !sys_schedule_islock()) {/* g_schedule_lock lock here */
+		/* which means we can use schedule() */
 		clear_rescheduled_flag();                    /* to force context switching */
 		schedule();
 	}

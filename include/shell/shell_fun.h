@@ -17,12 +17,13 @@ void shell_time(int argc, char const *argv[]);
 
 void shell_memory(int argc, char const *argv[]);
 
+void do_shell_clear(void);
 void shell_clear(int argc, char const *argv[]);
 
 void shell_echo(int argc, char const *argv[]);
 
 #if CONFIG_SHELL_DEBUG_EN && CONFIG_SHELL_EN
-struct set_variable{
+struct set_variable {
 	char *shell_v_name;
 	Shell_V_Type shell_v_type;
 	void *data_ptr;
@@ -50,6 +51,8 @@ void shell_shutdown(int argc, char const *argv[]);
 #if CONFIG_CPU_USE_RATE_CALCULATION
 void cpu_rate(int argc, char const *argv[]);
 #endif
+
+void shell_top(int argc, char const *argv[]);
 
 #endif
 

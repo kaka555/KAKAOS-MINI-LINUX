@@ -27,9 +27,7 @@ static void _schedule(void)
 	CPU_CRITICAL_ENTER();
 	OSTCBHighRdyPtr = _get_highest_prio_ready_TCB();
 	if (OSTCBHighRdyPtr != OSTCBCurPtr)
-	{
 		OSIntCtxSw();
-	}
 	CPU_CRITICAL_EXIT();
 	return ;
 }

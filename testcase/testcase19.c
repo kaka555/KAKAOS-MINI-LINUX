@@ -21,7 +21,7 @@ void fun3(void)
 	pr_shell("deap is %u\n", deap);
 	//pr_shell("now going to trigger panic\n");
 	//*(int *)0 = 0;
-	while(1) ;
+	//while(1) ;
 }
 
 void fun2(void)

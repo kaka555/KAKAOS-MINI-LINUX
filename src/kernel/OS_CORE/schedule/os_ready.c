@@ -54,9 +54,7 @@ static void __INIT __init_ready_group(void)
 	unsigned int i;
 	ready_group = 0;
 	for (i = 0; i < PRIO_MAX / (sizeof(READY_TABLE_TYPE) * 8); ++i)
-	{
 		ready_table[i] = 0;
-	}
 }
 INIT_FUN(__init_ready_group, 1);
 
@@ -195,4 +193,3 @@ out:
 	}
 }
 #endif
-

@@ -163,6 +163,8 @@ void task_start(void)
 #endif
 	if (0 != task_creat_ready(1000, 4, 5, "three", three, NULL, NULL))
 		panic("create task three error\n");
+	if (0 != task_creat_ready(1000, 5, 5, "four", four, NULL, NULL))
+		panic("create task four error\n");
 }
 
 /**

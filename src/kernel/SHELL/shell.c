@@ -283,7 +283,7 @@ static void redo(int argc, char const *argv[])
 {
 	(void)argc;
 	(void)argv;
-	if (using_shell_buffer_ptr->buffer_reserve){
+	if (using_shell_buffer_ptr->buffer_reserve) {
 		unsigned int i;
 		ASSERT(using_shell_buffer_ptr->index_reserve < BUFFER_SIZE, ASSERT_PARA_AFFIRM);
 		pr_shell("redo command: ");
@@ -377,6 +377,10 @@ static struct command resident_command_3[] =
 	{
 		.command_name = "tcb",
 		.f = shell_TCB_check,
+	},
+	{
+		.command_name = "top",
+		.f = shell_top,
 	}
 };
 static struct command resident_command_4[] =
@@ -579,37 +583,28 @@ static void __init_shell(void)
 	unsigned int i;
 	__init_command_n_ptr_hash_array();
 	for (i = 0; i < sizeof(resident_command_1) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_1(resident_command_1 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_2) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_2(resident_command_2 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_3) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_3(resident_command_3 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_4) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_4(resident_command_4 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_5) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_5(resident_command_5 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_6) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_6(resident_command_6 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_7) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_7(resident_command_7 + i);
-	}
+
 	for (i = 0; i < sizeof(resident_command_8) / sizeof(struct command); ++i)
-	{
 		_insert_struct_command_8(resident_command_8 + i);
-	}
 }
 INIT_FUN(__init_shell, 1);
 

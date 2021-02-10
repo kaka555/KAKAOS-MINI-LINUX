@@ -63,11 +63,9 @@ void shell_memory(int argc, char const *argv[])
 		buddy_ptr = (struct buddy *)_get_next_buddy_ptr_head(buddy_ptr);
 	}
 }
-void shell_clear(int argc, char const *argv[])
-{
-	(void)argc;
-	(void)argv;
 
+void do_shell_clear(void)
+{
 	console_putchar('\x1b');
 	console_putchar('[');
 	console_putchar('2');
@@ -76,6 +74,14 @@ void shell_clear(int argc, char const *argv[])
 	console_putchar('\x1b');
 	console_putchar('[');
 	console_putchar('H');
+}
+
+void shell_clear(int argc, char const *argv[])
+{
+	(void)argc;
+	(void)argv;
+
+	do_shell_clear();
 }
 #if CONFIG_SHELL_DEBUG_EN && CONFIG_SHELL_EN
 void shell_echo(int argc, char const *argv[])

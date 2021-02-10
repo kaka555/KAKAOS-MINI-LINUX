@@ -21,8 +21,21 @@
 volatile struct task_struct *OSTCBCurPtr;
 volatile struct task_struct *OSTCBHighRdyPtr;
 volatile int g_interrupt_count = 0;
+volatile int g_task_num = 0;
 
 static struct proc_dir_entry *task_info_proc_root;
+
+void get_task(struct task_struct *task)
+{
+	++task->ref;
+}
+
+void put_task(struct task_struct *task)
+{
+	ASSERT(task->ref > 0, ASSERT_INPUT);
+	if ((--task->ref == 0) && (TCB_IS_CREATED(task)))
+		ka_free(task);
+}
 
 /**
  * @Author      kaka
@@ -73,7 +86,7 @@ static int task_dump_stack_read(struct file *file_ptr, void *buffer, unsigned in
 {
 	struct task_struct *task_struct_ptr = file_ptr->private_data;
 	backtrace_call_stack((UINT32)task_struct_ptr->stack_end, task_struct_ptr->stack_size,
-		(UINT32)task_struct_ptr->stack);
+	                     (UINT32)task_struct_ptr->stack);
 	return len;
 }
 
@@ -148,12 +161,15 @@ int _must_check _task_init(
 	TCB_ptr->timeslice_hope_time = timeslice_hope_time;
 	TCB_ptr->timeslice_rest_time = timeslice_hope_time;
 	TCB_ptr->dynamic_module_ptr = NULL;
+	TCB_ptr->run_time = 0;
 	_register_in_TCB_list(TCB_ptr);
 	ret = create_task_proc(TCB_ptr);
 	if (unlikely(ret < 0)) {
 		ka_free(TCB_ptr->stack_end);
 		return ret;
 	}
+	TCB_ptr->ref = 1;
+	++g_task_num;
 	return 0;
 }
 
@@ -295,9 +311,9 @@ int _task_delete(struct task_struct *TCB_ptr)
 	}
 	if (TCB_ptr == OSTCBCurPtr)
 		OSTCBCurPtr = NULL;
-	if (TCB_IS_CREATED(TCB_ptr))
-		ka_free(TCB_ptr);
+	put_task(TCB_ptr);
 	CPU_CRITICAL_EXIT();
+	--g_task_num;
 	schedule();
 	return 0;
 }

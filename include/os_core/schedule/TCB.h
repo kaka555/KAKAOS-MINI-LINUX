@@ -66,6 +66,8 @@ typedef struct task_struct {
 	UINT32 attribution;							/*each bit of this element present an attribution*/
 	struct dynamic_module *dynamic_module_ptr;	/* the related dynamic module*/
 	UINT64 delay_reach_time; 					/* use when task is delayed*/
+	UINT64 run_time;							/* time of executing */
+	unsigned int ref;
 } TCB;
 
 /*To creat a task, use one of the two following function */
@@ -97,5 +99,8 @@ static inline void set_tcb_module(struct task_struct *TCB_ptr, struct dynamic_mo
 {
 	TCB_ptr->dynamic_module_ptr = mod_ptr;
 }
+
+void get_task(struct task_struct *task);
+void put_task(struct task_struct *task);
 
 #endif

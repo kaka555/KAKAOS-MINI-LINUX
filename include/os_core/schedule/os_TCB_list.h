@@ -23,4 +23,17 @@ void shell_check_TCB_list(void);
 void shell_stack_check(int argc, char const *argv[]);
 void shell_show_tasks_registers(int argc, char const *argv[]);
 
+extern struct TCB_list TCB_list[PRIO_MAX];
+
+#define for_each_task(i, TCB_ptr) \
+	for (i = 0; i < PRIO_MAX; ++i) \
+		list_for_each_entry(TCB_ptr, &TCB_list[i].head, same_prio_list)
+
+#define TOP_ARRAY_MAX 10
+
+struct top {
+	struct task_struct *task;
+	UINT64 base_time;
+};
+
 #endif
