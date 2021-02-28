@@ -16,6 +16,7 @@
 #define CONFIG_DEBUG_ON                 1
 #define CONFIG_MALLOC                   1
 #define CONFIG_MEM_POOL                 1
+#define CONFIG_CGROUP					1
 
 #define CPU_BIT                         32
 #define COUNT_DELAY_NUM                 10
