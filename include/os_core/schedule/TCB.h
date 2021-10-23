@@ -7,10 +7,12 @@
 #include <os_error.h>
 #include <os_cpu.h>
 
-typedef  unsigned  int         STACK_TYPE;
+typedef  unsigned  int	STACK_TYPE;
 
-typedef  unsigned  int         TASK_PRIO_TYPE;
-typedef  void                  (*functionptr)(void *para);
+typedef  unsigned  int	TASK_PRIO_TYPE;
+typedef  void			(*functionptr)(void *para);
+typedef  void			(*user_interrupt_fun)(void);
+
 
 #define SYS_ENTER_INTERRUPT()  do { CPU_IntDis();++g_interrupt_count;CPU_IntEn();} while (0)
 #define SYS_EXIT_INTERRUPT()   do { CPU_IntDis();--g_interrupt_count;CPU_IntEn();} while (0)
@@ -52,6 +54,7 @@ extern volatile int g_interrupt_count;
 struct dynamic_module;
 typedef struct task_struct {
 	STACK_TYPE *stack; 						/*the stack top of the task*/
+	user_interrupt_fun fun;
 	unsigned int stack_size;				/*bytes*/
 	STACK_TYPE *stack_end; 					/*the stack tail of the task*/
 	TASK_PRIO_TYPE reserve_prio;			/*used for Priority inversion problem*/

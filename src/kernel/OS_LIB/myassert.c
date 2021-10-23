@@ -1,10 +1,11 @@
 #include <myassert.h>
 #include <myMicroLIB.h>
 #include <dmesg.h>
+#include <printf_debug.h>
 
 void my_abort(void)
 {
-	pr_emerg("os stop\n");
+	panic("os stop\n");
 	while (1);
 }
 

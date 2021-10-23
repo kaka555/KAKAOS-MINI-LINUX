@@ -169,6 +169,7 @@ int _must_check _task_init(
 		return ret;
 	}
 	TCB_ptr->ref = 1;
+	TCB_ptr->fun = NULL;
 	++g_task_num;
 	return 0;
 }

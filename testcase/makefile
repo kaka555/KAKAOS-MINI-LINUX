@@ -1,4 +1,4 @@
-SRCS = testcase20.c
+SRCS = testcase21.c
 
 #ifeq ($(PROJECT),stm32f103)
 #SRCS += bsp_led.c

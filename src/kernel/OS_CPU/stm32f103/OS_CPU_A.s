@@ -57,6 +57,8 @@ OS_CPU_PendSVHandler:
     LDR     R1, =OSTCBCurPtr  /* ; OSTCBCurPtr->OSTCBStkPtr = SP;*/
     LDR     R1, [R1]
     CBZ     R1, OS_CPU_PendSVHandler_nosave
+    LDR     R2, [R1, #4]					/* get user interrupt fun */
+    CBNZ    R2, OS_CLEAR_USER_INTERRUPT_FUN
 
     SUBS    R0, R0, #0x20                                       /*; Save remaining regs r4-11 on process stack*/
     STM     R0, {R4-R11}
@@ -74,10 +76,15 @@ OS_CPU_PendSVHandler_nosave:
     LDM     R0, {R4-R11}                                        
     ADDS    R0, R0, #0x20
 
-    MSR     PSP, R0                                           
-    ORR     LR, LR, #0x04                                      
+    MSR     PSP, R0
+    ORR     LR, LR, #0x04
     CPSIE   I
 
-    BX      LR                                                 
+    BX      LR
+
+OS_CLEAR_USER_INTERRUPT_FUN:
+    MOV     R2, #0
+    STR	    R2, [R1, #4]
+    B	    OS_CPU_PendSVHandler_nosave
 
     /*END*/
